@@ -23,7 +23,9 @@
   },
   "homepage": "https://github.com/digimbyte/firebot#readme",
   "dependencies": {
-    "discord.js": "^11.5.1",
-    "dotenv": "^8.1.0"
+    "cron": "^1.8.2",
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.1.0",
+    "moment-timezone": "^0.5.31"
   }
 }
