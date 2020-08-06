@@ -1,0 +1,29 @@
+{
+  "name": "firebot",
+  "version": "1.0.0",
+  "description": "a simple bot for Discord group: Firebase Developers",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "build": "mkdir -p public && touch public/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/digimbyte/firebot.git"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "firebase"
+  ],
+  "author": "digimbyte",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/digimbyte/firebot/issues"
+  },
+  "homepage": "https://github.com/digimbyte/firebot#readme",
+  "dependencies": {
+    "discord.js": "^11.5.1",
+    "dotenv": "^8.1.0"
+  }
+}
