@@ -8,8 +8,13 @@ const config = require("./config.json");
 const moment = require('moment-timezone');
 const CronJob = require('cron').CronJob;
 
+var serviceAccount = require("./serviceAccountKey.json");
 
-
+const admin = require("firebase-admin");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://fire-bot-database-1.firebaseio.com",
+})
 
 /////////////////////
 // TRACKERS
@@ -18,11 +23,20 @@ let StartUp = false;
 if (!StartUp) {
   StartUp = true;
   try {
-    client.login(process.env.TOKEN);
+    client.login('bottoken');
+    console.log('Logged IN');
+    updateDbJob.start();
   } catch (e) {
     console.log(e);
   }
 }
+
+//////////////////////////
+////// Temp Storage //////
+//////////////////////////
+
+let points = {}
+let answers = {}
 
 ///////////////////////
 // MAIN PROCESS START
@@ -107,12 +121,12 @@ client.on('error', e => {
 
 async function ProcessMessage(message) {
 
-  if (!message.content.startsWith(config.PREFIX)) return; // is this a command?
-  if (message.member.roles.cache.get(config.MOD_ROLE)) {
-    const parse = ParseMessage(message);
-    try {
-      switch (parse.command) {
-        case "help": message.channel.send(`Commands:
+  if (!message.content.startsWith('!')) return; // is this a command?
+  // if (message.member.roles.cache.get(config.MOD_ROLE)) {
+  const parse = ParseMessage(message);
+  try {
+    switch (parse.command) {
+      case "help": message.channel.send(`Commands:
         !link EMOTE @ROLE
         !unlink EMOTE
         !set http://discord/message/url
@@ -123,27 +137,30 @@ async function ProcessMessage(message) {
         !setrole @ROLE http://discord/message/url
         !removerole http://discord/message/url
         !linktz @ROLE @ROLETRACKER moment-timezone-offset`);
-          break;
+        break;
 
-        case "link": UpdateLink(parse); break;
-        case "unlink": DeleteLink(parse); break;
-        case "set": SetTable(parse); break;
+      case "link": UpdateLink(parse); break;
+      case "unlink": DeleteLink(parse); break;
+      case "set": SetTable(parse); break;
 
-        case "accept": SetAccept(parse); break;
-        case "decline": SetDecline(parse); break;
+      case "accept": SetAccept(parse); break;
+      case "decline": SetDecline(parse); break;
 
-        case "setrole": SetRole(parse); break;
-        case "removerole": RemoveRole(parse); break;
+      case "setrole": SetRole(parse); break;
+      case "removerole": RemoveRole(parse); break;
 
-        case "linktz": LinkTz(parse); break;
-        case "settz": SetTz(parse); break;
-        case "removetz": RemoveTz(parse); break;
-      }
-    } catch (error) {
-      console.error(error);
-      message.reply('there was an error trying to execute that command!');
+      case "linktz": LinkTz(parse); break;
+      case "settz": SetTz(parse); break;
+      case "removetz": RemoveTz(parse); break;
+      case "helped": sendHelpedPrompt(message.content, message.author.id, message.channel.id); break;
+      case "points": sendPoints(message.author.id, message.channel.id); break;
+      case "update": updateTest(); break;
     }
+  } catch (error) {
+    console.error(error);
+    message.reply('there was an error trying to execute that command!');
   }
+  // }
 }
 
 function ParseMessage(msg) {
@@ -356,6 +373,115 @@ async function giveTimezone(channel, user, targetRole) {
   }
 }
 
+//Calculate Number of Words:
+function numOfWords(msg) {
+  return msg.split(/\s+/).length
+}
+
+//POINTS Functions 
+async function sendHelpedPrompt(msg, userId, channelId) {
+  if (numOfWords(msg) === 2) {
+    const cmdArray = msg.split(/\b\s+/, 2)
+    const userHelpedId = cmdArray[1].toLowerCase().replace('<@', '').replace('>', '').replace('!', '').replace('&', '')
+    if (client.channels.cache.get(channelId)) {
+      const channelReq = client.channels.cache.get(channelId)
+      channelReq.send(`<@${userHelpedId}>, did <@${userId}> helped you in resolving your issue?`).then(async (helpedPrompt) => {
+        await helpedPrompt.react('✅')
+        await helpedPrompt.react('❌')
+
+        const filter = (reaction, user) => {
+          return ['✅', '❌'].includes(reaction.emoji.name) && user.id === userHelpedId;
+        };
+        helpedPrompt.awaitReactions(filter, { max: 1, time: 3600000, errors: ['time'] })
+          .then(async collected => {
+            const reaction = collected.first();
+
+            switch (reaction.emoji.name) {
+              case '✅':
+                //Credit Rewards
+                if (points[userId] !== undefined) {
+                  points[userId] = points[userId] + 25
+                  answers[userId] = answers[userId] + 1
+                } else {
+                  points[userId] = 25
+                  answers[userId] = 1
+                }
+                channelReq.send(`Yay <@${userId}> points increased by 25!`)
+                return
+
+              case '❌':
+                //Deny
+                //Maybe any more moderation feature like logging rejected commands
+                return
+
+              default:
+                return;
+            }
+          }).catch(collected => {
+            message.reply('TIME OUT!! \nPlease react within 1 hour next time.'); //Maybe add user name here
+            console.log(collected)
+          });
+      }).catch((errSendingPrompt) => {
+        console.log(errSendingPrompt)
+        return
+      })
+      return 0
+    } else {
+      console.error('Failed sending message')
+      return 0
+    }
+  } else {
+    return
+  }
+}
+
+function sendPoints(userId, channelId) {
+  if (userId === 'adminID') {
+    if (client.channels.cache.get(channelId)) {
+      const channelReq = client.channels.cache.get(channelId)
+      channelReq.send(`${JSON.stringify(points)}`)
+    }
+  } else {
+    return
+  }
+}
+
+////////////////////////////
+////// Cron Functions //////
+////////////////////////////
+
+const updateDbJob = new CronJob('0 */5 * * * *', function () {
+  if (Object.keys(points).length !== 0) {
+    Object.keys(points).forEach(async (eachUser) => {
+      const snapUserStats = (await admin.database().ref(`/discord/stats/${eachUser}/`).once('value'))
+      if (snapUserStats.exists()) {
+        console.log('exists')
+        const userStats = snapUserStats.val()
+        console.log(userStats)
+        const userPoints = Number(userStats.points) + Number(points[eachUser])
+        const userAnswers = Number(userStats.answers) + Number(answers[eachUser])
+        console.log(userPoints)
+        console.log(userAnswers)
+        return admin.database().ref(`/discord/stats/${eachUser}/`).update({ "points": userPoints, "answers": userAnswers }).then(() => {
+          delete points[eachUser]
+          delete answers[eachUser]
+        }).catch((err) => console.log(err))
+      } else {
+        console.log('New User')
+        console.log('does not exists')
+        console.log(eachUser)
+        console.log(points[eachUser])
+        console.log(answers[eachUser])
+        return admin.database().ref(`/discord/stats/${eachUser}/`).update({ "discordId": eachUser, "points": points[eachUser], "answers": answers[eachUser] }).then(() => {
+          delete points[eachUser]
+          delete answers[eachUser]
+        }).catch((err) => console.log(err))
+      }
+    })
+  } else {
+    console.log('No new Data');
+  }
+})
 
 // CORE FUNCTIONS
 function DecodeUrl(url) {

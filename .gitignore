@@ -62,3 +62,4 @@ typings/
 
 # private data
 ./settings/credentials.json
+./serviceAccountKey.json
