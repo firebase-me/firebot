@@ -8,6 +8,14 @@ const config = require("./config.json");
 const moment = require('moment-timezone');
 const CronJob = require('cron').CronJob;
 
+var serviceAccount = require("./serviceAccountKey.json");
+
+const admin = require("firebase-admin");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://fire-bot-database-1.firebaseio.com",
+})
+
 /////////////////////
 // TRACKERS
 /////////////////////
@@ -15,8 +23,9 @@ let StartUp = false;
 if (!StartUp) {
   StartUp = true;
   try {
-    client.login('botToken');
+    client.login('NzE3MDIxNzc5OTg1NTYzNzE5.XtUQkQ.wKxQ4lOSYWG0hyvajxJsZmdFEWA');
     console.log('Logged IN');
+    updateDbJob.start();
   } catch (e) {
     console.log(e);
   }
@@ -27,6 +36,7 @@ if (!StartUp) {
 //////////////////////////
 
 let points = {}
+let answers = {}
 
 ///////////////////////
 // MAIN PROCESS START
@@ -144,6 +154,7 @@ async function ProcessMessage(message) {
       case "removetz": RemoveTz(parse); break;
       case "helped": sendHelpedPrompt(message.content, message.author.id, message.channel.id); break;
       case "points": sendPoints(message.author.id, message.channel.id); break;
+      case "update": updateTest(); break;
     }
   } catch (error) {
     console.error(error);
@@ -390,8 +401,10 @@ async function sendHelpedPrompt(msg, userId, channelId) {
                 //Credit Rewards
                 if (points[userId] !== undefined) {
                   points[userId] = points[userId] + 25
+                  answers[userId] = answers[userId] + 1
                 } else {
                   points[userId] = 25
+                  answers[userId] = 1
                 }
                 channelReq.send(`Yay <@${userId}> points increased by 25!`)
                 return
@@ -432,6 +445,43 @@ function sendPoints(userId, channelId) {
     return
   }
 }
+
+////////////////////////////
+////// Cron Functions //////
+////////////////////////////
+
+const updateDbJob = new CronJob('0 */5 * * * *', function () {
+  if (Object.keys(points).length !== 0) {
+    Object.keys(points).forEach(async (eachUser) => {
+      const snapUserStats = (await admin.database().ref(`/discord/stats/${eachUser}/`).once('value'))
+      if (snapUserStats.exists()) {
+        console.log('exists')
+        const userStats = snapUserStats.val()
+        console.log(userStats)
+        const userPoints = Number(userStats.points) + Number(points[eachUser])
+        const userAnswers = Number(userStats.answers) + Number(answers[eachUser])
+        console.log(userPoints)
+        console.log(userAnswers)
+        return admin.database().ref(`/discord/stats/${eachUser}/`).update({ "points": userPoints, "answers": userAnswers }).then(() => {
+          delete points[eachUser]
+          delete answers[eachUser]
+        }).catch((err) => console.log(err))
+      } else {
+        console.log('New User')
+        console.log('does not exists')
+        console.log(eachUser)
+        console.log(points[eachUser])
+        console.log(answers[eachUser])
+        return admin.database().ref(`/discord/stats/${eachUser}/`).update({ "discordId": eachUser, "points": points[eachUser], "answers": answers[eachUser] }).then(() => {
+          delete points[eachUser]
+          delete answers[eachUser]
+        }).catch((err) => console.log(err))
+      }
+    })
+  } else {
+    console.log('No new Data');
+  }
+})
 
 // CORE FUNCTIONS
 function DecodeUrl(url) {
