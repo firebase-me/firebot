@@ -23,7 +23,7 @@ let StartUp = false;
 if (!StartUp) {
   StartUp = true;
   try {
-    client.login('NzE3MDIxNzc5OTg1NTYzNzE5.XtUQkQ.wKxQ4lOSYWG0hyvajxJsZmdFEWA');
+    client.login('bottoken');
     console.log('Logged IN');
     updateDbJob.start();
   } catch (e) {
