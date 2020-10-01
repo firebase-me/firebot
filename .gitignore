@@ -62,4 +62,6 @@ typings/
 
 # private data
 ./settings/credentials.json
-./serviceAccountKey.json
+/serviceAccountKey.json
+
+/.env
