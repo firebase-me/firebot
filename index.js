@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const fs = require("fs");
+const axios = require("axios");
 
 require("dotenv").config();
 require("http").createServer().listen(3000);
@@ -191,6 +192,9 @@ async function ProcessMessage(message) {
         break;
       case "stats":
         await sendUserStats(message.author.id);
+        break;
+      case "kick":
+        await kickUser(message.author.id, message.guild.id, message.content);
         break;
     }
   } catch (error) {
@@ -557,6 +561,60 @@ async function sendUserStats(userDiscordId) {
       );
   } else {
     console.log("New user");
+    return;
+  }
+}
+
+async function kickUser(adminId, guildId, msg) {
+  const msgArray = String(msg).trim().split(" ");
+  if (msgArray.length === 2) {
+    if (
+      client.guilds.cache
+        .get(guildId)
+        .members.cache.get(adminId)
+        .roles.cache.find((role) => role.id === MODERATOR_ROLE)
+    ) {
+      const userToKick = msgArray[1].match(/[0-9]+/)[0];
+      const kickUrl = `https://discord.com/api/v6/guilds/${guildId}/members/${userToKick}`;
+      return axios.default.delete(kickUrl, {
+        headers: { authorization: `Bot ${process.env.BOT_TOKEN}` },
+      }).then((kickResponse) => {
+        if (kickResponse.status === 204) {
+          return client.channels.cache.get("channelId").send(`${userToKick} kicked by ${adminId}`);
+          // Replace ChannelID with the ID of channel where you want to keep the logs.
+        } 
+        return
+      });
+    }
+    return;
+  } else {
+    return;
+  }
+}
+
+async function kickUser(adminId, guildId, msg) {
+  const msgArray = String(msg).trim().split(" ");
+  if (msgArray.length === 2) {
+    if (
+      client.guilds.cache
+        .get(guildId)
+        .members.cache.get(adminId)
+        .roles.cache.find((role) => role.id === process.env.MODERATOR_ROLE)
+    ) {
+      const userToBan = msgArray[1].match(/[0-9]+/)[0];
+      const kickUrl = `https://discord.com/api/v6/guilds/${guildId}/bans/${userToBan}`;
+      return axios.default.put(banUrl, {
+        headers: { authorization: `Bot ${process.env.BOT_TOKEN}` },
+      }).then((kickResponse) => {
+        if (kickResponse.status === 204) {
+          return client.channels.cache.get("channelId").send(`${userToKick} banned by ${adminId}`);
+          // Replace ChannelID with the ID of channel where you want to keep the logs.
+        } 
+        return
+      });
+    }
+    return;
+  } else {
     return;
   }
 }
