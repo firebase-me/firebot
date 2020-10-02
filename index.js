@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const fs = require("fs");
+const axios = require("axios");
 
 require("dotenv").config();
 require("http").createServer().listen(3000);
@@ -191,6 +192,22 @@ async function ProcessMessage(message) {
         break;
       case "stats":
         await sendUserStats(message.author.id);
+        break;
+      case "kick":
+        await kickUser(
+          message.author.id,
+          message.guild.id,
+          message.channel.id,
+          message.content
+        );
+        break;
+      case "ban":
+        await banUser(
+          message.author.id,
+          message.guild.id,
+          message.channel.id,
+          message.content
+        );
         break;
     }
   } catch (error) {
@@ -557,6 +574,52 @@ async function sendUserStats(userDiscordId) {
       );
   } else {
     console.log("New user");
+    return;
+  }
+}
+
+async function kickUser(adminId, guildId, channelId, msg) {
+  const msgArray = String(msg).trim().split(" ");
+  if (msgArray.length === 2) {
+    if (
+      client.guilds.cache
+        .get(guildId)
+        .members.cache.get(adminId)
+        .roles.cache.find((role) => role.id === MODERATOR_ROLE)
+    ) {
+      const userToKick = msgArray[1].match(/[0-9]+/)[0];
+      await client.guilds.cache
+        .get(guildId)
+        .members.cache.get(userToKick)
+        .kick();
+      await client.channels.cache
+        .get(channelId)
+        .send(`<@${userToBan}> kicked by <@${adminId}>`);
+    }
+    return;
+  } else {
+    return;
+  }
+}
+
+async function banUser(adminId, guildId, channelId, msg) {
+  const msgArray = String(msg).trim().split(" ");
+  if (msgArray.length === 2) {
+    if (
+      client.guilds.cache
+        .get(guildId)
+        .members.cache.get(adminId)
+        .roles.cache.find((role) => role.id === process.env.MODERATOR_ROLE)
+    ) {
+      const userToBan = msgArray[1].match(/[0-9]+/)[0];
+      await client.guilds.cache.get(guildId).members.cache.get(userToBan).ban();
+      await client.channels.cache
+        .get(channelId)
+        .send(`<@${userToBan}> banned by <@${adminId}>`);
+      return;
+    }
+    return;
+  } else {
     return;
   }
 }
