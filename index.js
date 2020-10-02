@@ -194,7 +194,20 @@ async function ProcessMessage(message) {
         await sendUserStats(message.author.id);
         break;
       case "kick":
-        await kickUser(message.author.id, message.guild.id, message.content);
+        await kickUser(
+          message.author.id,
+          message.guild.id,
+          message.channel.id,
+          message.content
+        );
+        break;
+      case "ban":
+        await banUser(
+          message.author.id,
+          message.guild.id,
+          message.channel.id,
+          message.content
+        );
         break;
     }
   } catch (error) {
@@ -565,7 +578,7 @@ async function sendUserStats(userDiscordId) {
   }
 }
 
-async function kickUser(adminId, guildId, msg) {
+async function kickUser(adminId, guildId, channelId, msg) {
   const msgArray = String(msg).trim().split(" ");
   if (msgArray.length === 2) {
     if (
@@ -575,16 +588,13 @@ async function kickUser(adminId, guildId, msg) {
         .roles.cache.find((role) => role.id === MODERATOR_ROLE)
     ) {
       const userToKick = msgArray[1].match(/[0-9]+/)[0];
-      const kickUrl = `https://discord.com/api/v6/guilds/${guildId}/members/${userToKick}`;
-      return axios.default.delete(kickUrl, {
-        headers: { authorization: `Bot ${process.env.BOT_TOKEN}` },
-      }).then((kickResponse) => {
-        if (kickResponse.status === 204) {
-          return client.channels.cache.get("channelId").send(`${userToKick} kicked by ${adminId}`);
-          // Replace ChannelID with the ID of channel where you want to keep the logs.
-        } 
-        return
-      });
+      await client.guilds.cache
+        .get(guildId)
+        .members.cache.get(userToKick)
+        .kick();
+      await client.channels.cache
+        .get(channelId)
+        .send(`<@${userToBan}> kicked by <@${adminId}>`);
     }
     return;
   } else {
@@ -592,7 +602,7 @@ async function kickUser(adminId, guildId, msg) {
   }
 }
 
-async function kickUser(adminId, guildId, msg) {
+async function banUser(adminId, guildId, channelId, msg) {
   const msgArray = String(msg).trim().split(" ");
   if (msgArray.length === 2) {
     if (
@@ -602,16 +612,11 @@ async function kickUser(adminId, guildId, msg) {
         .roles.cache.find((role) => role.id === process.env.MODERATOR_ROLE)
     ) {
       const userToBan = msgArray[1].match(/[0-9]+/)[0];
-      const kickUrl = `https://discord.com/api/v6/guilds/${guildId}/bans/${userToBan}`;
-      return axios.default.put(banUrl, {
-        headers: { authorization: `Bot ${process.env.BOT_TOKEN}` },
-      }).then((kickResponse) => {
-        if (kickResponse.status === 204) {
-          return client.channels.cache.get("channelId").send(`${userToKick} banned by ${adminId}`);
-          // Replace ChannelID with the ID of channel where you want to keep the logs.
-        } 
-        return
-      });
+      await client.guilds.cache.get(guildId).members.cache.get(userToBan).ban();
+      await client.channels.cache
+        .get(channelId)
+        .send(`<@${userToBan}> banned by <@${adminId}>`);
+      return;
     }
     return;
   } else {
