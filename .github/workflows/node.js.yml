@@ -25,5 +25,5 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm install
-    - run: cp -a ${{env.ENV_FIREBOT}} ./
+    - run: cp -a ${{secrets.ENV_FIREBOT}} ./
     - run: pm2 restart firebot
