@@ -50,6 +50,7 @@ function ProcessEvent(event, client) {
     ) {
       const meta = event.d;
 
+      const roleMessage = [meta.channel_id, meta.message_id].join(':');
       let targetRole;
       // IS MESSAGE AGREE ROLE?
       if (config.ROLES[[meta.channel_id, meta.message_id].join(":")])
@@ -71,9 +72,12 @@ function ProcessEvent(event, client) {
 
       if (targetRole == null) return;
 
+      // if (rolePoolContains(targetRole))
+      //   rolePool(meta.channel_id, meta.user_id, targetRole);
+      // else
       if (event.t == "MESSAGE_REACTION_ADD")
         giveRole(meta.channel_id, meta.user_id, targetRole);
-      if (event.t == "MESSAGE_REACTION_REMOVE")
+      else if (event.t == "MESSAGE_REACTION_REMOVE")
         takeRole(meta.channel_id, meta.user_id, targetRole);
     }
   } catch (e) {
@@ -142,79 +146,30 @@ async function ProcessMessage(message) {
         !setrole @ROLE http://discord/message/url
         !removerole http://discord/message/url
         !linktz @ROLE @ROLETRACKER moment-timezone-offset`);
-        break;
+          break;
 
-      case "link":
-        UpdateLink(parse);
-        break;
-      case "unlink":
-        DeleteLink(parse);
-        break;
-      case "set":
-        SetTable(parse);
-        break;
+        case "link": UpdateLink(parse); break;
+        case "unlink": DeleteLink(parse); break;
+        case "set": SetTable(parse); break;
 
-      case "accept":
-        SetAccept(parse);
-        break;
-      case "decline":
-        SetDecline(parse);
-        break;
+        case "accept": SetAccept(parse); break;
+        case "decline": SetDecline(parse); break;
 
-      case "setrole":
-        SetRole(parse);
-        break;
-      case "removerole":
-        RemoveRole(parse);
-        break;
+        case "setrole": SetRole(parse); break;
+        case "removerole": RemoveRole(parse); break;
 
-      case "linktz":
-        LinkTz(parse);
-        break;
-      case "settz":
-        SetTz(parse);
-        break;
-      case "removetz":
-        RemoveTz(parse);
-        break;
-      case "helped":
-        sendHelpedPrompt(
-          message.content,
-          message.author.id,
-          message.channel.id
-        );
-        break;
-      case "points":
-        await sendPoints(message.author.id, message.channel.id);
-        break;
-      case "update":
-        updateTest();
-        break;
-      case "stats":
-        await sendUserStats(message.author.id);
-        break;
-      case "kick":
-        await kickUser(
-          message.author.id,
-          message.guild.id,
-          message.channel.id,
-          message.content
-        );
-        break;
-      case "ban":
-        await banUser(
-          message.author.id,
-          message.guild.id,
-          message.channel.id,
-          message.content
-        );
-        break;
+        case "linktz": LinkTz(parse); break;
+        case "settz": SetTz(parse); break;
+        case "removetz": RemoveTz(parse); break;
+
+
+        case "pool": setPool(parse); break;
+        case "poolDelete": removePool(parse); break;
+      }
+    } catch (error) {
+      console.error(error);
+      message.reply('there was an error trying to execute that command!');
     }
-  } catch (error) {
-    console.error(error);
-    message.reply("there was an error trying to execute that command!");
-  }
-  // }
 }
 
 function ParseMessage(msg) {
@@ -238,12 +193,37 @@ function ParseMessage(msg) {
     command: _command,
     args: _args,
     argresult: _argresult,
+    mentions: {
+      users: msg.mentions.users,
+      roles: msg.mentions.roles
+    }
   };
+}
+async function rolePoolContains(targetRole) {
+  console.log(targetRole);
+  keys = Object.keys(config.ROLE_POOL).filter(pool => config.ROLE_POOL[pool].includes(targetRole));
+  console.log(keys);
+  result = keys.length > 0;
+  return result;
+
+}
+
+async function rolePool(channel, user, role_id) {
+  try {
+    c = client.channels.cache.get(channel);
+    m = await c.guild.members.fetch(user);
+    console.log(role_id);
+    r = c.guild.roles.cache.get(role_id);
+    m.roles.add(r);
+  }
+  catch (e) {
+    console.log(e);
+  }
 }
 
 function objectContains(input, mask) {
   for (let key of Object.keys(mask)) {
-    if (input[key] !== mask[key]) {
+    if (mask[key] !== input[key]) {
       return false;
     }
   }
@@ -274,14 +254,19 @@ async function takeRole(channel, user, role_id) {
   }
 }
 
+async function setPool(parse) {
+  let final = [];
+  parse.mentions.roles.forEach(role => final.push(role.id));
+  config.ROLE_POOL[parse.args[0]] = final;
+  fs.writeFileSync("./config.json", JSON.stringify(config, null, 4));
+}
+
 async function SetRole(parse) {
   const urlMessage = (config.ROLE_TABLE = DecodeUrl(parse.args[1]));
   const targetRole = EmoteID(parse.args[0]);
   if (urlMessage != null) {
     if (!config.ACCEPT) return;
-    const newMessage = await client.channels.cache
-      .get(urlMessage.channel)
-      .fetchMessage(urlMessage.message);
+    const newMessage = await client.channels.cache.get(urlMessage.channel).messages.fetch(urlMessage.message);
     newMessage.react(config.ACCEPT);
     config.ROLES[[newMessage.channel.id, newMessage.id].join(":")] = targetRole;
     fs.writeFileSync("./config.json", JSON.stringify(config, null, 4));
@@ -290,14 +275,9 @@ async function SetRole(parse) {
 async function RemoveRole(parse) {
   const urlMessage = (config.ROLE_TABLE = DecodeUrl(parse.args[0]));
   if (urlMessage != null) {
-    const newMessage = await client.channels.cache
-      .get(urlMessage.channel)
-      .fetchMessage(urlMessage.message);
-    newMessage.reactions.cache
-      .get(config.ACCEPT)
-      .remove()
-      .catch((error) => console.error("Failed to remove reactions: ", error));
-    delete config.ROLES[[newMessage.channel.id, newMessage.id].join(":")];
+    const newMessage = await client.channels.cache.get(urlMessage.channel).messages.fetch(urlMessage.message);
+    newMessage.reactions.cache.get(config.ACCEPT).remove().catch(error => console.error('Failed to remove reactions: ', error));
+    delete config.ROLES[[newMessage.channel.id, newMessage.id].join(':')];
     fs.writeFileSync("./config.json", JSON.stringify(config, null, 4));
   }
 }
@@ -327,11 +307,9 @@ function DeleteLink(parse) {
 
 // DEPLOY ROLE TABLE TO MESSAGE
 async function SetTable(parse) {
-  const urlMessage = (config.ROLE_TABLE = DecodeUrl(parse.argresult));
+  const urlMessage = DecodeUrl(parse.argresult);
   if (urlMessage != null) {
-    const newMessage = await client.channels.cache
-      .get(urlMessage.channel)
-      .fetchMessage(urlMessage.message);
+    const newMessage = await client.channels.cache.get(urlMessage.channel).messages.fetch(urlMessage.message);
     SetEmotes(newMessage);
     config.ROLE_TABLE = urlMessage;
     fs.writeFileSync("./config.json", JSON.stringify(config, null, 4));
@@ -375,16 +353,9 @@ async function RemoveTz(parse) {
   // REMOVE TIMEZONE PARENT ROLE TO MESSAGE
   const urlMessage = (config.ROLE_TABLE = DecodeUrl(parse.args[0]));
   if (urlMessage != null) {
-    const newMessage = await client.channels.cache
-      .get(urlMessage.channel)
-      .fetchMessage(urlMessage.message);
-    newMessage.reactions.cache
-      .get(config.ACCEPT)
-      .remove()
-      .catch((error) => console.error("Failed to remove reactions: ", error));
-    delete config.TIMEZONE_ROLES[
-      [newMessage.channel.id, newMessage.id].join(":")
-    ];
+    const newMessage = await client.channels.cache.get(urlMessage.channel).messages.fetch(urlMessage.message);
+    newMessage.reactions.cache.get(config.ACCEPT).remove().catch(error => console.error('Failed to remove reactions: ', error));
+    delete config.TIMEZONE_ROLES[[newMessage.channel.id, newMessage.id].join(':')];
     fs.writeFileSync("./config.json", JSON.stringify(config, null, 4));
   }
 }
@@ -431,6 +402,7 @@ async function giveTimezone(channel, user, targetRole) {
           // object by the emoji, there's a method on reaction.users.fetch() you call to get all of the users that
           // reacted to the message w/ that emoji and then you can remove it
           // it only returns 100 max so you would need to handle getting the other reactions after the 100th one
+          // https://discordjs.guide/popular-topics/reactions.html#removing-reactions-by-user
 
           const selected = !rolesList.includes(
             config.TIMEZONE_ROLES[[message.channel.id, message.id].join(":")]
@@ -440,10 +412,8 @@ async function giveTimezone(channel, user, targetRole) {
           // if (finalList[[message.channel.id, message.id].join(':')]) continue;
           // console.log(targetRole.split(':')[1]);
 
-          await message.reactions.resolveID(config.ACCEPT);
-          const userReactions = await message.reactions.cache.filter(
-            (reaction) => reaction.users.cache.has(user)
-          );
+          await message.reactions.resolve(c.guild.emoji.cache.get(config.ACCEPT));
+          const userReactions = await message.reactions.cache.filter(reaction => reaction.users.cache.has(user));
           console.log(JSON.stringify(userReactions));
           try {
             for (const reaction of userReactions.values()) {
