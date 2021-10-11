@@ -24,7 +24,7 @@ let StartUp = false;
 if (!StartUp) {
   StartUp = true;
   try {
-    client.login(process.env.BOT_TOKEN);
+    client.login(process.env.TOKEN);
     console.log("Logged IN");
   } catch (e) {
     console.log(e);
