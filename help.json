@@ -1,0 +1,27 @@
+[
+	{
+		"trigger": "code",
+		"name": "HOW TO PASTE CODE",
+		"body": "\\`\\`\\`js\n<insert code here>\n\\`\\`\\`"
+	},
+	{
+		"trigger": "support",
+		"name": "FIREBASE SUPPORT",
+		"body": "https://firebase.google.com/support/troubleshooter/contact"
+	},
+	{
+		"trigger": "pricing",
+		"name": "FIREBASE PRICING",
+		"body": "https://firebase.google.com/pricing"
+	},
+	{
+		"trigger": "status",
+		"name": "FIREBASE STATUS",
+		"body": "https://status.firebase.google.com/"
+	},
+	{
+		"trigger": "pricing",
+		"name": "FIREBASE PRICING",
+		"body": "https://firebase.google.com/pricing"
+	}
+]

@@ -1,0 +1,43 @@
+discord:
+  token: 'NjI2OTE3OTY0MTM3ODg5Nzky.XY1E2g.ro8m3-hm9NJkOg20O3D91QczrTo'
+  command: '!'
+  roles:
+    staff: '946564758935576617'
+    verified: '946564812303900743'
+    expert: ''
+    helper: ''
+  channels:
+    verify: '946563674858979361'
+    roles: '946564419293437962'
+
+captcha: 
+  - link: 'https://i.imgur.com/N8eiBjY.png'
+    correct: '5D9A3'
+    options: 
+      - '509A3'
+      - '5D9A3'
+      - '5D9AB'
+  - link: 'https://i.imgur.com/OMeCvcj.png'
+    correct: '3AB46'
+    options: 
+      - '3A1346'
+      - '3AI346'
+      - '3AB46'
+  - link: 'https://i.imgur.com/e2uP0Pz.png'
+    'correct': '38578'
+    'options': 
+    - '38576' 
+    - '38578' 
+    - '33576'
+  - link: 'https://i.imgur.com/JGi8Zk1.png'
+    correct: '357A6'
+    options: 
+      - '357A6' 
+      - '357A8'
+      - '367A6'
+  - link: 'https://i.imgur.com/k9n7wKk.png'
+    correct: 'CBD16'
+    options: 
+      - 'C8D16' 
+      - 'CBD16' 
+      - 'C18D18'

@@ -1,0 +1,19 @@
+discord:
+  token: ''
+  command: '!'
+  roles:
+    staff: ''
+    verified: ''
+    expert: ''
+    helper: ''
+  channels:
+    verify: ''
+    roles: ''
+
+captcha: 
+  - link: 'https://i.imgur.com/N8eiBjY.png'
+    correct: 'A'
+    options: 
+      - 'A'
+      - 'B'
+      - 'C'
