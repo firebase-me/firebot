@@ -1,5 +1,5 @@
 discord:
-  token: 'NjI2OTE3OTY0MTM3ODg5Nzky.XY1E2g.ro8m3-hm9NJkOg20O3D91QczrTo'
+  token: ''
   command: '!'
   roles:
     staff: '946564758935576617'
