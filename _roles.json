@@ -1,0 +1,25 @@
+[
+	{
+		"id": "947045799471218688",
+		"name": "frameworks",
+		"description": "Select the frameworks you use",
+		"roles": [
+			{
+				"id": "946970814383804477",
+				"name": "React"
+			},
+			{
+				"id": "946970852551979049",
+				"name": "Vue"
+			},
+			{
+				"id": "946970868335116289",
+				"name": "Flutter"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "Unity"
+			}
+		]
+	}
+]

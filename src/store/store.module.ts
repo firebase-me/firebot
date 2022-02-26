@@ -1,9 +1,14 @@
 import { Module } from '@nestjs/common';
-import { DataService } from './store.service';
+import { StoreService } from './store.service';
 
 @Module({
   imports: [],
-  exports: [DataService],
-  providers: [DataService]
+  exports: [StoreService],
+  providers: [StoreService]
 })
-export class DataModule {}
+export class StoreModule {
+  constructor(private storeService: StoreService) {
+    StoreService.Instance = this.storeService;
+  }
+  getState = () => { return this.storeService.getState(); }
+}

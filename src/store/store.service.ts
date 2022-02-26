@@ -6,8 +6,8 @@ import Datastore from 'nedb';
 import path from 'path';
 
 @Injectable()
-export class DataService {
-  static Instance: DataService;
+export class StoreService {
+  static Instance: StoreService;
   private djinn = new Djinn();
   private db = {
     status: () => {},
@@ -17,6 +17,10 @@ export class DataService {
     status: () => {},
     stores: [],
   };
+  private state = {
+    attempts: [],
+    captcha: {},
+  }
 
   private directory = '/../../data';
   private dbPath = {
@@ -42,12 +46,13 @@ export class DataService {
     CAPTCHA: 'Captcha',
   };
   constructor(private config: ConfigService) {
-    if (DataService.Instance === undefined) DataService.Instance = this;
-    else this.init();
 
   }
 
   docHelp = () => {}
+  getState = () => {
+    return this.state
+  }
 
   
   private init = () => {

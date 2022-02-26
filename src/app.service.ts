@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Client, GatewayIntentBits} from 'discord.js';
-import { DataModule } from './store/store.module';
 import ClientEvents from './events';
+import { StoreService } from './store/store.service';
 
 @Injectable()
 export class AppService {
@@ -15,18 +15,18 @@ export class AppService {
 
 constructor(
   private config: ConfigService,
-  private cache: DataModule){
+  private state: StoreService){
 this.client.login(this.config.get('discord.token'));
 
 
 this.client.on("ready", async () => {
-  ClientEvents.ready.default(this.client,this.config);
+  ClientEvents.ready.default(this.client,this.config, this.state);
 });
 this.client.on("interactionCreate", async (interaction) => {
-  ClientEvents.interactions.create(this.client,this.config, interaction);
+  ClientEvents.interactions.create(this.client,this.config, interaction, this.state);
 });
 this.client.on("messageCreate", async message => {
-  ClientEvents.messages.create(this.client,this.config,message);
+  ClientEvents.messages.create(this.client,this.config,message, this.state);
 });
 }
 }

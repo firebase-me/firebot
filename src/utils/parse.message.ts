@@ -1,3 +1,4 @@
+// All messages and user commands must be processed through this function
 export default (msg, config) => {
   const message = msg.content; // parse the valid string into it's arguments for further processing.
   let args = message.replace(/ /g, ' ').split(/\s+/); //split message into sections based on spaces, ignore any 0 length values
