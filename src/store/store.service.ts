@@ -19,7 +19,7 @@ export class StoreService {
   };
   private state = {
     attempts: [],
-    captcha: {},
+    collectors: [],
   }
 
   private directory = '/../../data';

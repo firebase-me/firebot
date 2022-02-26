@@ -7,14 +7,17 @@ export default (client: Client, config, state) => {
 
   // Find verification message else post new one
   if (!config.get('discord.messages.verify')) {
-    // Find Self Roles and attach listeners
-    // form verification message
     const embed = new Embed()
       .setTitle(`Captcha Verification`)
       .setDescription(`Click below to begin the captcha verification process.`)
       .setColor(hexToRgb(config.get('palette.secondary')));
 
-    const row = new ActionRow().addComponents(new ButtonComponent().setCustomId('welcome.verify').setLabel('Verify').setStyle(ButtonStyle.Primary));
+    const row = new ActionRow().addComponents(new ButtonComponent()
+    .setCustomId('welcome.verify')
+    .setLabel('Verify')
+    .setEmoji({ id:'740757073330962474'})
+    .setStyle(ButtonStyle.Secondary)
+    );
 
     // send
     client.guilds.cache
