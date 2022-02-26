@@ -15,7 +15,8 @@ const create = async (client:Client, config, message) => {
     const md = message.content.split(" ");
 
     // commands
-    if(md[0].toLowerCase() == `${config.get('discord.command')}help` && md[1].toLowerCase() == `set`) {
+    if(md[0].toLowerCase() == `${config.get('discord.command')}help`)
+        if( md[1].toLowerCase() == `set`) {
 
         // staff
         if(!message.member.roles.cache.has(config.get('discord.roles.staff'))) {
@@ -52,6 +53,16 @@ const create = async (client:Client, config, message) => {
             .setDescription(`Set!\n\n> Name: **${md[2]}**\n> Content: **${md.slice(3).join(" ")}** \n\nTo make edits to this entry, use ${config.get('discord.command')}help set ${md[2].toLowerCase()} <body>`)
         return await message.reply({ embeds: [embed] });
     }
+    else
+    if( md[1].toLowerCase() == `list`) {
+        const data = await JsonRW.Read(helpDoc);
+        const embed = new Embed()
+        .setColor([0,0,180])
+        .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
+        .setDescription(`Current help list!\n\n NAME: DESCRIPTION \n${ data.reduce((agg,i) => agg += `> **${i.trigger}:** *${i.name}* \n`,"")}\n\n use ***${config.get('discord.command')}help <name>***`)
+    return await message.reply({ embeds: [embed] });
+    }
+
     if(md[0].toLowerCase() == `${config.get('discord.command')}help`) {
 
         // correct usage?
@@ -64,7 +75,7 @@ const create = async (client:Client, config, message) => {
         }
 
         // valid?
-        const result = (await JsonRW.Read(helpDoc)).filter(t => t.name.toLowerCase() == md.slice(1).join(" ").toLowerCase())[0];
+        const result = (await JsonRW.Read(helpDoc)).filter(t => t.trigger.toLowerCase() == md.slice(1).join(" ").toLowerCase())[0];
         if(result == null) {
             const embed = new Embed()
                 .setColor([100,0,0])
