@@ -82,7 +82,7 @@ const create = async (client, config, event, state) => {
               name: event.user.tag,
             })
             .setDescription(`Correct! The verified role will be assigned to you in a few moments.`);
-          await i.reply({ embeds: [embed], ephemeral: true }).catch((err) => {});
+          await i.update({ embeds: [embed] }).catch((err) => {});
             console.log(config.get('discord.roles.verified'))
           await event.member.roles.add(config.get('discord.roles.member')).catch((err) => console.log(`No permissions to assign roles!`,err));
         }
