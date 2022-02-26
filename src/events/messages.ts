@@ -39,6 +39,7 @@ const create = async (client:Client, config, message) => {
         const data = await JsonRW.Read(helpDoc);
         data.filter(t => t.name.toLowerCase() != md[2].toLowerCase()); // enables overwriting
         data.push({
+            trigger: md[2].toLowerCase(),
             name: md[2],
             body: md.slice(3).join(" ")
         });
