@@ -1,7 +1,7 @@
 [
 	{
 		"trigger": "code",
-		"name": "HOW TO PASTE CODE",
+		"name": "How to share code",
 		"body": "\\`\\`\\`js\n<insert code here>\n\\`\\`\\`"
 	},
 	{
