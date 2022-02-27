@@ -1,44 +1,115 @@
-import { ActionRow, ComponentType, Embed, SelectMenuComponent, SelectMenuInteraction } from 'discord.js';
-import rn from 'random-number';
+import { ActionRow, ButtonComponent, ButtonStyle, ChannelType, ComponentType, Embed, SelectMenuComponent, SelectMenuInteraction } from 'discord.js';
+import JsonRW from 'jsonrw';
+import { StoreService } from 'src/store/store.service';
+import { hexToRgb } from 'src/utils/color';
 
 const handle = async (client, config, event, state) => {
-  const reply = await event.deferReply({ ephemeral: true });
-  const captcha = config.get('captcha');
+  // FIND EXISTING MESSAGE FOR USER IF ONE EXISTS
+  // ELSE CREATE NEW MESSAGE
 
-  const captchaTest =
-    captcha[
-      rn({
-        min: 0,
-        max: captcha.length - 1,
-        integer: true,
-      })
-    ];
+  //
 
-  // form embed
+  const method = event.customId.split('.')[1];
+  // METHODS:
+  // selfrole.$back
+  // selfrole.$prev
+  // selfrole.$next
+  // selfrole.$close
+  // selfrole.$open
+  // selfrole.category.rolename
+
+  // IS FUNCTIONAL ID?
+  if (method.startsWith('$')) {
+    // FUNCTIONAL ID
+    if (method == '$back') {
+      // GO BACK
+      await paginate(client, config, event, state);
+    }
+    if (method == '$prev') {
+      // PREV PAGE
+      await paginate(client, config, event, state);
+    }
+    if (method == '$next') {
+      // NEXT PAGE
+      await paginate(client, config, event, state);
+    }
+    if (method == '$close') {
+      // CLOSE
+      await event.delete();
+    }
+    if (method == '$open') {
+      // OPEN
+      await paginate(client, config, event, state);
+    }
+  } else {
+  }
+
+  // open new dialog
+
+  // new page
+};
+
+// Creates initial message for user to click on
+const create = async (client, config, event, state) => {
+  // Find verification message else post new one
+  const rolesData = `./_roles.json`;
+  const categories = await JsonRW.Read(rolesData);
+
   const embed = new Embed()
-    .setColor([72, 89, 22])
-    .setTitle(`Captcha Verification`)
-    .setFooter({
-      text: event.guild.name,
-      iconURL: event.guild.iconURL(),
-    })
-    .setImage(captchaTest.link);
+    .setTitle(`**ROLE MANAGMENT**`)
+    .setDescription('```Select a button to manage your roles and options.```')
+    .setColor(hexToRgb(config.get('palette.primary')));
 
   const options = [];
-  captchaTest.options.forEach((t) => {
-    options.push({
-      label: t,
-      //   description: 'DESCRIPTION PLACE HOLDER',
-      value: t,
-    });
+  categories.forEach((c) => {
+    options.push(new ButtonComponent().setCustomId(`selfroles.$open.${c.name}`).setLabel(c.name).setStyle(ButtonStyle.Secondary));
   });
 
-  const row = new ActionRow().addComponents(
-    new SelectMenuComponent()
-      .setCustomId('welcome.captcha')
-      .setPlaceholder('Select the matching code!')
-      .addOptions(...options),
-  );
+  const row = new ActionRow().addComponents(...options);
+
+  // send
+  client.guilds.cache
+    .first()
+    .channels.fetch(event.channel.id)
+    .then((channel) => {
+      if (channel.type == ChannelType.GuildText) channel.send({ embeds: [embed], components: [row] });
+    });
+};
+
+// Paginate interactions
+const paginate = async (client, config, event, state: StoreService) => {
+  const reply = await event.deferReply({ ephemeral: true });
+  const rolesData = `./_roles.json`;
+  const Roles = await JsonRW.Read(rolesData);
+
+  const method = event.customId.split('.')[1];
+  const modifier = event.customId.split('.')[2];
+
+  // LOAD AVAILABLE ROLES
+  const roles = config.get('captcha');
+  console.log('EVENT!:', event.member.roles.cache.keys());
+  // LOAD USER ROLES
+  const userRoles = await event.member.roles.cache.keys();
+
+  // form embed
+  const embed = new Embed().setColor([72, 89, 22])
+  .setTitle(`Captcha Verification`)
+  .setFooter({
+    text: event.guild.name,
+    iconURL: event.guild.iconURL(),
+  });
+  //.setImage(captchaTest.link);
+
+  const options = [];
+  Roles.find((c) => c.name == modifier).roles.forEach((r) => {
+    options.push(new ButtonComponent()
+    .setCustomId(`selfroles.${modifier}.${r.name.toLowerCase()}`)
+    .setLabel(r.name)
+    // .setEmoji(isNaN(r.icon[0]) ? r.icon : `{id:${r.icon}}`)
+    .setStyle(ButtonStyle.Secondary));
+  });
+
+  const row = new ActionRow().addComponents(...options.slice(0,5));
 
   // reply
   let xx = await event.editReply({
@@ -56,45 +127,9 @@ const handle = async (client, config, event, state) => {
     max: 1,
     fetchReply: true,
   });
-
-  collector.on('collect', async (i:SelectMenuInteraction) => {
-        const code = i.values[0];
-        await event.editReply({ embeds: [embed], components: [], ephemeral: true }).catch((err) => {});
-    
-        if (code != captchaTest.correct) {
-          const embed = new Embed()
-            .setColor([100, 0, 0])
-            .setAuthor({
-              iconURL: event.user.displayAvatarURL(),
-              name: event.user.tag,
-            })
-            .setDescription(
-              `Incorrect. ${state.getState().attempts.filter((t) => t.id == event.user.id).length >= 3 ? `You will now be kicked.` : `Try again by clicking the button again.`}`,
-            );
-          await i.update({ embeds: [embed] }).catch((err) => {});
-    
-          if (state.getState().attempts.filter((t) => t.id == event.user.id).length >= 3) await event.member.kick().catch((err) => console.log(`No permissions to kick!`,err));
-        } else {
-          const embed = new Embed()
-            .setColor([0, 255, 0])
-            .setAuthor({
-              iconURL: event.user.displayAvatarURL(),
-              name: event.user.tag,
-            })
-            .setDescription(`Correct! The verified role will be assigned to you in a few moments.`);
-          await i.update({ embeds: [embed] }).catch((err) => {});
-            console.log(config.get('discord.roles.verified'))
-          await event.member.roles.add(config.get('discord.roles.member')).catch((err) => console.log(`No permissions to assign roles!`,err));
-        }
-      });
-
-  console.log('SET STATE CAPTCHA', event.user.name);
 };
-
-const create = async (client, config, event, state) => {
-}
 //         await event.editReply({ embeds: [embed], components: [], ephemeral: true }).catch((err) => {});
-    
+
 //         if (code != selected.correct) {
 //           const embed = new Embed()
 //             .setColor([100, 0, 0])
@@ -106,7 +141,7 @@ const create = async (client, config, event, state) => {
 //               `Incorrect. ${state.getState().attempts.filter((t) => t.id == event.user.id).length >= 3 ? `You will now be kicked.` : `Try again by clicking the button again.`}`,
 //             );
 //           await i.reply({ embeds: [embed], ephemeral: true }).catch((err) => {});
-    
+
 //           if (state.getState().attempts.filter((t) => t.id == event.user.id).length >= 3) await event.member.kick().catch((err) => console.log(`No permissions to kick!`));
 //         } else {
 //           const embed = new Embed()
@@ -117,14 +152,14 @@ const create = async (client, config, event, state) => {
 //             })
 //             .setDescription(`Correct! The verified role will be assigned to you in a few moments.`);
 //           await i.reply({ embeds: [embed], ephemeral: true }).catch((err) => {});
-    
+
 //           await event.member.roles.add(config.get('discord.roles.verified')).catch((err) => console.log(`No permissions to assign roles!`));
 //         }
 //       });
 // };
 
 // const collectorCallback = async (i) => {
-    
+
 // //   collector.on('collect', async (i) => {
 //     //   collector.on('collect', async (i) => {
 //     console.log('COLLECTOR ON: ', i.value);

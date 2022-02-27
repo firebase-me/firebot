@@ -1,4 +1,5 @@
 import { ActionRow, Embed, Interaction, InteractionCollector, InteractionResponseType, InteractionWebhook, SelectMenuComponent } from 'discord.js';
+import selfroles from './microfunctions/selfroles';
 import captcha from './microfunctions/verifycaptcha';
 
 const create = async (client, config, event, state) => {
@@ -13,19 +14,14 @@ const create = async (client, config, event, state) => {
     });
     console.log(state.getState().attempts);
     // whisper with captcha
-    await captcha.create(client, config, event, state);
+    await captcha.handle(client, config, event, state);
   }
 
-  // process captcha
-  if (event.customId == 'welcome.captcha') {
-    // log attempt
-    state.getState().attempts.push({
-      id: event.user.id,
-      time: Date.now(),
-    });
-    console.log(state.getState().attempts);
+  // Handle Self Role
+  if (event.customId.startsWith('selfrole')) { //  == 'selfrole.framework.react'
+    // Check if user has member role first
     // whisper with captcha
-    await captcha.validate(client, config, event, state);
+    await selfroles.handle(client, config, event, state);
   }
 };
 

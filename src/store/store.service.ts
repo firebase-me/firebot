@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Djinn, DjinnService } from 'djinn-state';
 
@@ -6,7 +6,7 @@ import Datastore from 'nedb';
 import path from 'path';
 
 @Injectable()
-export class StoreService {
+export class StoreService implements OnApplicationBootstrap{
   static Instance: StoreService;
   private djinn = new Djinn();
   private db = {
@@ -21,6 +21,7 @@ export class StoreService {
     attempts: [],
     collectors: [],
   }
+  private users = [];
 
   private directory = '/../../data';
   private dbPath = {
@@ -45,6 +46,9 @@ export class StoreService {
     HELP: 'Help',
     CAPTCHA: 'Captcha',
   };
+  onApplicationBootstrap() {
+      // this.db.doDataInitialization();
+  }
   constructor(private config: ConfigService) {
 
   }
@@ -52,11 +56,6 @@ export class StoreService {
   docHelp = () => {}
   getState = () => {
     return this.state
-  }
-
-  
-  private init = () => {
-
   }
 }
 

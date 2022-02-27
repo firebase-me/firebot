@@ -2,6 +2,7 @@ import { Client, ActionRow, Embed, SelectMenuComponent } from 'discord.js';
 import rn from 'random-number';
 import JsonRW from 'jsonrw';
 import { hexToRgb } from 'src/utils/color';
+import selfroles from './microfunctions/selfroles';
 
 
 const create = async (client: Client, config, message,state) => {
@@ -13,8 +14,12 @@ const create = async (client: Client, config, message,state) => {
     // variable
     const msg = message.content.toLowerCase();
     const md = message.content.split(' ');
-
     // commands
+    if (md[0] == '!Set.RoleManagment' && message.member.roles.cache.has(config.get('discord.roles.staff'))) {
+      console.log("msg recieved")
+      selfroles.create(client, config, message, state);
+    }
+    else
     if (md[0].toLowerCase() == `${config.get('discord.command')}help`)
       if (md[1].toLowerCase() == `set`) {
         // staff

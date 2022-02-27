@@ -1,24 +1,197 @@
 [
 	{
-		"id": "947045799471218688",
-		"name": "frameworks",
+		"name": "Platforms",
+		"description": "Select the frameworks you use",
+		"roles": [
+			{
+				"id": "946970852551979049",
+				"name": "Web",
+				"icon": "467717128015839252"
+			},
+			{
+				"id": "946970852551979049",
+				"name": "Android",
+				"icon": "467717128015839252"
+			},
+			{
+				"id": "946970814383804477",
+				"name": "iOS",
+				"icon": "🇷"
+			},
+			{
+				"id": "946970852551979049",
+				"name": "Admin SDK",
+				"icon": "467717128015839252"
+			}
+		]
+	},	{
+		"name": "Frameworks",
+		"description": "Select the frameworks you use",
+		"roles": [
+			{
+				"id": "946970852551979049",
+				"name": "Vue",
+				"icon": "467717128015839252"
+			},
+			{
+				"id": "946970814383804477",
+				"name": "React",
+				"icon": "🇷"
+			},
+			{
+				"id": "946970852551979049",
+				"name": "Angular",
+				"icon": "467717128015839252"
+			},
+			{
+				"id": "946970852551979049",
+				"name": "Ionic",
+				"icon": "467717128015839252"
+			},
+			{
+				"id": "946970868335116289",
+				"name": "Flutter",
+				"icon": "🇫"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "Unity",
+				"icon": "900426664566198292"
+			}
+		]
+	},	{
+		"name": "Languages",
 		"description": "Select the frameworks you use",
 		"roles": [
 			{
 				"id": "946970814383804477",
-				"name": "React"
+				"name": "JavaScript",
+				"icon": "🇷"
 			},
 			{
 				"id": "946970852551979049",
-				"name": "Vue"
+				"name": "TypeSCript",
+				"icon": "467717128015839252"
 			},
 			{
 				"id": "946970868335116289",
-				"name": "Flutter"
+				"name": "Python",
+				"icon": "🇫"
 			},
 			{
 				"id": "946970891789680710",
-				"name": "Unity"
+				"name": "Dart",
+				"icon": "900426664566198292"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "GoLang",
+				"icon": "900426664566198292"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "C#",
+				"icon": "900426664566198292"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "C++",
+				"icon": "900426664566198292"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "Swift",
+				"icon": "900426664566198292"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "Kootlin",
+				"icon": "900426664566198292"
+			}
+		]
+	},	{
+		"name": "Country",
+		"description": "Select the frameworks you use",
+		"roles": [
+			{
+				"id": "946970814383804477",
+				"name": "US",
+				"icon": "flag_us"
+			},
+			{
+				"id": "946970852551979049",
+				"name": "DE",
+				"icon": "flag_de"
+			},
+			{
+				"id": "946970868335116289",
+				"name": "AU",
+				"icon": "flag_au"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "IN",
+				"icon": "flag_in"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "IT",
+				"icon": "flag_it"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "CA",
+				"icon": "flag_ca"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "GB",
+				"icon": "flag_gb"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "JM",
+				"icon": "flag_jm"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "EU",
+				"icon": "flag_eu"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "AT",
+				"icon": "flag_at"
+			},
+			{
+				"id": "946970891789680710",
+				"name": "UA",
+				"icon": "flag_ua"
+			}
+		]
+	},	{
+		"name": "Experts Program",
+		"description": "Select the frameworks you use",
+		"roles": [
+			{
+				"id": "946970814383804477",
+				"name": "Firebase",
+				"icon": "🇷"
+			},
+			{
+				"id": "946970814383804477",
+				"name": "React",
+				"icon": "🇷"
+			},
+			{
+				"id": "946970814383804477",
+				"name": "Angular",
+				"icon": "🇷"
+			},
+			{
+				"id": "946970814383804477",
+				"name": "Flutter",
+				"icon": "🇷"
 			}
 		]
 	}
