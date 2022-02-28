@@ -3,7 +3,6 @@ import selfroles from './microfunctions/selfroles';
 import captcha from './microfunctions/verifycaptcha';
 
 const create = async (client, config, event, state) => {
-  console.log('EVENT TYPE', event.customId);
   
   // process verify click
   if (event.customId == 'welcome.verify') {

@@ -16,7 +16,7 @@ const create = async (client: Client, config, message,state) => {
     const md = message.content.split(' ');
     // commands
     if (md[0] == '!Set.RoleManagment' && message.member.roles.cache.has(config.get('discord.roles.staff'))) {
-      console.log("msg recieved")
+      await message.delete();
       selfroles.create(client, config, message, state);
     }
     else

@@ -1,196 +1,197 @@
 [
 	{
-		"name": "Platforms",
-		"description": "Select the frameworks you use",
+		"label": "Platforms",
+		"description": "Select the rameworks you use",
 		"roles": [
 			{
-				"id": "946970852551979049",
-				"name": "Web",
+				"id": "947830204678688768",
+				"label": "Web",
 				"icon": "467717128015839252"
 			},
 			{
-				"id": "946970852551979049",
-				"name": "Android",
+				"id": "947830279131791401",
+				"label": "Android",
 				"icon": "467717128015839252"
 			},
 			{
-				"id": "946970814383804477",
-				"name": "iOS",
+				"id": "947830311071399937",
+				"label": "iOS",
 				"icon": "🇷"
 			},
 			{
-				"id": "946970852551979049",
-				"name": "Admin SDK",
+				"id": "947830337008971786",
+				"label": "Admin SDK",
 				"icon": "467717128015839252"
 			}
 		]
 	},	{
-		"name": "Frameworks",
-		"description": "Select the frameworks you use",
+		"label": "Frameworks",
+		"description": "Select the rameworks you use",
 		"roles": [
 			{
 				"id": "946970852551979049",
-				"name": "Vue",
+				"label": "Vue",
 				"icon": "467717128015839252"
 			},
 			{
 				"id": "946970814383804477",
-				"name": "React",
+				"label": "React",
 				"icon": "🇷"
 			},
 			{
-				"id": "946970852551979049",
-				"name": "Angular",
+				"id": "947830887842717736",
+				"label": "Angular",
 				"icon": "467717128015839252"
 			},
 			{
-				"id": "946970852551979049",
-				"name": "Ionic",
+				"id": "947830920914821120",
+				"label": "Ionic",
 				"icon": "467717128015839252"
 			},
 			{
 				"id": "946970868335116289",
-				"name": "Flutter",
+				"label": "Flutter",
+				"icon": "🇫"
+			},
+			{
+				"id": "947830972198559814",
+				"label": "Unity",
+				"icon": "900426664566198292"
+			}
+		]
+	},	{
+		"label": "Languages",
+		"description": "Select the rameworks you use",
+		"roles": [
+			{
+				"id": "946970814383804477",
+				"label": "JavaScript",
+				"icon": "🇷"
+			},
+			{
+				"id": "946970852551979049",
+				"label": "TypeSCript",
+				"icon": "467717128015839252"
+			},
+			{
+				"id": "946970868335116289",
+				"label": "Python",
 				"icon": "🇫"
 			},
 			{
 				"id": "946970891789680710",
-				"name": "Unity",
+				"label": "Dart",
+				"icon": "900426664566198292"
+			},
+			{
+				"id": "946970891789680710",
+				"label": "GoLang",
+				"icon": "900426664566198292"
+			},
+			{
+				"id": "946970891789680710",
+				"label": "C#",
+				"icon": "900426664566198292"
+			},
+			{
+				"id": "946970891789680710",
+				"label": "C++",
+				"icon": "900426664566198292"
+			},
+			{
+				"id": "946970891789680710",
+				"label": "Swift",
+				"icon": "900426664566198292"
+			},
+			{
+				"id": "946970891789680710",
+				"label": "Kootlin",
 				"icon": "900426664566198292"
 			}
 		]
 	},	{
-		"name": "Languages",
-		"description": "Select the frameworks you use",
+		"label": "Location",
+		"description": "Select the rameworks you use",
+		"max": 2,
 		"roles": [
 			{
-				"id": "946970814383804477",
-				"name": "JavaScript",
-				"icon": "🇷"
+				"id": "947862055619280930",
+				"label": "US",
+				"icon": "🇺🇸"
 			},
 			{
-				"id": "946970852551979049",
-				"name": "TypeSCript",
-				"icon": "467717128015839252"
+				"id": "947862128474325002",
+				"label": "DE",
+				"icon": "🇩🇪"
 			},
 			{
-				"id": "946970868335116289",
-				"name": "Python",
-				"icon": "🇫"
+				"id": "947862131758473277",
+				"label": "AU",
+				"icon": "🇦🇺"
 			},
 			{
-				"id": "946970891789680710",
-				"name": "Dart",
-				"icon": "900426664566198292"
+				"id": "947862134577045564",
+				"label": "IN",
+				"icon": "🇮🇳"
 			},
 			{
-				"id": "946970891789680710",
-				"name": "GoLang",
-				"icon": "900426664566198292"
+				"id": "947862136665804871",
+				"label": "IT",
+				"icon": "🇮🇹"
 			},
 			{
-				"id": "946970891789680710",
-				"name": "C#",
-				"icon": "900426664566198292"
+				"id": "947862138595196988",
+				"label": "CA",
+				"icon": "🇨🇦"
 			},
 			{
-				"id": "946970891789680710",
-				"name": "C++",
-				"icon": "900426664566198292"
+				"id": "947862140071579700",
+				"label": "GB",
+				"icon": "🇬🇧"
 			},
 			{
-				"id": "946970891789680710",
-				"name": "Swift",
-				"icon": "900426664566198292"
+				"id": "947862141430534145",
+				"label": "JM",
+				"icon": "🇯🇲"
 			},
 			{
-				"id": "946970891789680710",
-				"name": "Kootlin",
-				"icon": "900426664566198292"
+				"id": "947862598790049802",
+				"label": "EU",
+				"icon": "🇪🇺"
+			},
+			{
+				"id": "947862605698060398",
+				"label": "AT",
+				"icon": "🇦🇹"
+			},
+			{
+				"id": "947862611301646356",
+				"label": "UA",
+				"icon": "🇺🇦"
 			}
 		]
 	},	{
-		"name": "Country",
-		"description": "Select the frameworks you use",
+		"label": "Experts Program",
+		"description": "Select the rameworks you use",
 		"roles": [
 			{
 				"id": "946970814383804477",
-				"name": "US",
-				"icon": "flag_us"
-			},
-			{
-				"id": "946970852551979049",
-				"name": "DE",
-				"icon": "flag_de"
-			},
-			{
-				"id": "946970868335116289",
-				"name": "AU",
-				"icon": "flag_au"
-			},
-			{
-				"id": "946970891789680710",
-				"name": "IN",
-				"icon": "flag_in"
-			},
-			{
-				"id": "946970891789680710",
-				"name": "IT",
-				"icon": "flag_it"
-			},
-			{
-				"id": "946970891789680710",
-				"name": "CA",
-				"icon": "flag_ca"
-			},
-			{
-				"id": "946970891789680710",
-				"name": "GB",
-				"icon": "flag_gb"
-			},
-			{
-				"id": "946970891789680710",
-				"name": "JM",
-				"icon": "flag_jm"
-			},
-			{
-				"id": "946970891789680710",
-				"name": "EU",
-				"icon": "flag_eu"
-			},
-			{
-				"id": "946970891789680710",
-				"name": "AT",
-				"icon": "flag_at"
-			},
-			{
-				"id": "946970891789680710",
-				"name": "UA",
-				"icon": "flag_ua"
-			}
-		]
-	},	{
-		"name": "Experts Program",
-		"description": "Select the frameworks you use",
-		"roles": [
-			{
-				"id": "946970814383804477",
-				"name": "Firebase",
+				"label": "Firebase",
 				"icon": "🇷"
 			},
 			{
 				"id": "946970814383804477",
-				"name": "React",
+				"label": "React",
 				"icon": "🇷"
 			},
 			{
 				"id": "946970814383804477",
-				"name": "Angular",
+				"label": "Angular",
 				"icon": "🇷"
 			},
 			{
 				"id": "946970814383804477",
-				"name": "Flutter",
+				"label": "Flutter",
 				"icon": "🇷"
 			}
 		]

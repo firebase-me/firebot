@@ -1,13 +1,30 @@
-import { ActionRow, ButtonComponent, ButtonStyle, ChannelType, ComponentType, Embed, SelectMenuComponent, SelectMenuInteraction } from 'discord.js';
+import { APIMessageComponentEmoji } from 'discord-api-types/v9';
+import {
+  ActionRow,
+  ButtonComponent,
+  ButtonInteraction,
+  ButtonStyle,
+  CachedManager,
+  ChannelType,
+  ComponentType,
+  Embed,
+  GuildMemberRoleManager,
+  Interaction,
+  SelectMenuComponent,
+  SelectMenuInteraction,
+} from 'discord.js';
 import JsonRW from 'jsonrw';
 import { StoreService } from 'src/store/store.service';
 import { hexToRgb } from 'src/utils/color';
+import _ from 'lodash';
+const handle = async (client, config, event: ButtonInteraction, state: StoreService) => {
+  // // FIND EXISTING MESSAGE FOR USER IF ONE EXISTS
+  // let whisper = state.getState(['whispers', event.user.id]);
+  // // ELSE CREATE NEW MESSAGE
+  // if (!whisper) {
+  // }
 
-const handle = async (client, config, event, state) => {
-  // FIND EXISTING MESSAGE FOR USER IF ONE EXISTS
-  // ELSE CREATE NEW MESSAGE
-
-  //
+  // //
 
   const method = event.customId.split('.')[1];
   // METHODS:
@@ -20,29 +37,33 @@ const handle = async (client, config, event, state) => {
 
   // IS FUNCTIONAL ID?
   if (method.startsWith('$')) {
-    // FUNCTIONAL ID
-    if (method == '$back') {
-      // GO BACK
-      await paginate(client, config, event, state);
-    }
-    if (method == '$prev') {
-      // PREV PAGE
-      await paginate(client, config, event, state);
-    }
-    if (method == '$next') {
-      // NEXT PAGE
-      await paginate(client, config, event, state);
-    }
-    if (method == '$close') {
-      // CLOSE
-      await event.delete();
-    }
+    // // FUNCTIONAL ID
+    // if (method == '$prev') {
+    //   // PREV PAGE
+    //   await paginate(client, config, event, state);
+    // }
+    // if (method == '$next') {
+    //   // NEXT PAGE
+    //   await paginate(client, config, event, state);
+    // }
     if (method == '$open') {
       // OPEN
       await paginate(client, config, event, state);
     }
-  } else {
+    if (method == '$close') {
+      // CLOSE
+      // await event.message.("TEST");//.deleteReply();
+    }
+    // if (method == '$select') {
+    //   // SELECT
+    //   await paginate(client, config, event, state);
+    // }
+    // if (method == '$back') {
+    //   // GO BACK
+    //   await paginate(client, config, event, state);
+    // }
   }
+  return;
 
   // open new dialog
 
@@ -62,7 +83,7 @@ const create = async (client, config, event, state) => {
 
   const options = [];
   categories.forEach((c) => {
-    options.push(new ButtonComponent().setCustomId(`selfroles.$open.${c.name}`).setLabel(c.name).setStyle(ButtonStyle.Secondary));
+    options.push(new ButtonComponent().setCustomId(`selfroles.$open.${c.label.toLowerCase()}`).setLabel(c.label).setStyle(ButtonStyle.Secondary));
   });
 
   const row = new ActionRow().addComponents(...options);
@@ -78,97 +99,162 @@ const create = async (client, config, event, state) => {
 
 // Paginate interactions
 const paginate = async (client, config, event, state: StoreService) => {
-  const LABEL_NEXT = 'Next >>';
-  const LABEL_PREV = '<< Prev';
-  const NUM_ITEMS_PER_ROW = 5;
-  const NUM_ROWS_PER_PAGE = 5;
+  await event.deferReply({ ephemeral: true });
+  const idMeta = event.customId.split('.');
+  let currentPage = 0;
 
-  const reply = await event.deferReply({ ephemeral: true });
-  const rolesData = `./_roles.json`;
-  const Roles = await JsonRW.Read(rolesData);
-
-  const customIdParts = event.customId.split('.');
-  const method = customIdParts[1];
-  const modifier = customIdParts[2];
-  let pageNum = 0;
-
-  if (customIdParts.length >= 4) {
-    pageNum = Number(customIdParts[3]);  // force to a number
-    if (Number.isNaN(pageNum)) {
-      console.error(`customIdParts[3] is NaN: ${customIdParts[3]}`);
-      pageNum = 0;
-    }
-  }
+  const method = idMeta[1];
+  const category = idMeta[2];
+  console.log('Paginate:', idMeta);
 
   // LOAD AVAILABLE ROLES
-  const roles = config.get('captcha');
-  console.log('EVENT!:', event.member.roles.cache.keys());
-  // LOAD USER ROLES
-  const userRoles = await event.member.roles.cache.keys();
+  const Roles = await JsonRW.Read('./_roles.json');
+  const options = Roles.find((c) => c.label.toLowerCase() == category.toLowerCase()).roles;
 
-  // form embed
-  const embed = new Embed().setColor([72, 89, 22])
-    .setTitle(`Captcha Verification`)
-    .setFooter({
-      text: event.guild.name,
-      iconURL: event.guild.iconURL(),
-    });
-  //.setImage(captchaTest.link);
-
-  const options = [];
-  Roles.find((c) => c.name == modifier).roles.forEach((r) => {
-    options.push(new ButtonComponent()
-      .setCustomId(`selfroles.${modifier}.${r.name.toLowerCase()}`)
-      .setLabel(r.name)
-      // .setEmoji(isNaN(r.icon[0]) ? r.icon : `{id:${r.icon}}`)
-      .setStyle(ButtonStyle.Secondary));
-  });
-
-  const rows = [];
-  const firstItemOffset = pageNum * NUM_ITEMS_PER_ROW * NUM_ROWS_PER_PAGE;
-  let lastOffset = 0;
-
-  console.log(JSON.stringify(options[0]));
-  for (let i = 0; (i < NUM_ROWS_PER_PAGE && lastOffset < options.length); i++) {
-    let offset = firstItemOffset + i * NUM_ITEMS_PER_ROW;
-    lastOffset = Math.min(offset + NUM_ITEMS_PER_ROW, options.length);
-    // console.log(`pageNum(${pageNum}) firstItemOffset(${firstItemOffset}) offset(${offset}) lastOffset(${lastOffset}) options.length(${options.length})`);
-    let temp = options.slice(offset, lastOffset);
-    const newRow = new ActionRow().addComponents(...temp);
-    rows.push(newRow);
-  }
-
-  // method($open)   modifier(Country)
-  let buttons = [];
-  if (pageNum > 0) {
-    buttons.push(new ButtonComponent().setCustomId(`selfroles.$prev.${modifier}.${pageNum - 1}`).setLabel(LABEL_PREV).setStyle(ButtonStyle.Secondary));
-  }
-
-  if (lastOffset < options.length) {
-    buttons.push(new ButtonComponent().setCustomId(`selfroles.$next.${modifier}.${pageNum + 1}`).setLabel(LABEL_NEXT).setStyle(ButtonStyle.Secondary))
-  }
-
-  if (buttons.length > 0) {
-    rows.push(new ActionRow().addComponents(...buttons));
-  }
+  // generate page elements
+  const page = await generatePage(event, currentPage, options, event.member.roles.cache);
+  let message = "``` + Please navigate the following menu to enable and disable roles.```";
 
   // reply
   let xx = await event.editReply({
-    embeds: [embed],
-    components: rows,
+    content: message,
+    // embeds: [page.embed],
+    components: page.rows,
     ephemeral: true,
     fetchReply: true,
   });
 
   // collector
   const collector = xx.createMessageComponentCollector({
-    // filter: (m) => m.author.id == event.author.id,
-    componentType: ComponentType.SelectMenu,
-    time: 4.32e7,
-    max: 1,
+    componentType: ComponentType.Button,
+    time: 1000 * 60 * 10,
     fetchReply: true,
   });
+  // ID MEANING: selfroles.$open.category.page
+  // menu - action - modifier - page
+  // selfroles - open - country - 0
+  // selfroles - select - udcountry - 1
+  collector.on('collect', async (i: ButtonInteraction) => {
+    const idMeta = i.customId.split('.');
+    const action = idMeta[1];
+    const modifier = idMeta[2];
+    const bias = idMeta[3];
+    console.log('COLLECTED', idMeta);
+
+    // refresh page
+    if (action == '$close') {
+      collector.stop('close');
+      return;
+    }
+    if (action == '$select') {
+      const msg = `You have ${bias == 'true' ? 'added' : 'removed'} the ${options.find((c) => c.id == modifier).label} role.`;
+      message = '```' + msg + '```';
+      // await event.message.guild.members.cache.get(event.user.id).roles.add(i.label);
+      if (bias == 'true') await event.member.roles.add(modifier).catch((err) => console.log(`No permissions to assign roles!`, err));
+      else await event.member.roles.remove(modifier).catch((err) => console.log(`No permissions to assign roles!`, err));
+    }
+
+    // refresh page
+    if (action == '$next') currentPage++;
+    if (action == '$prev') currentPage--;
+
+    const newPage = await generatePage(i, currentPage, options, event.member.roles.cache);
+    await i.update({
+      content: message,
+      // embeds: [newPage.embed],
+      components: newPage.rows,
+      fetchReply: true,
+    });
+  });
+
+  collector.on('end', (collected) => {
+    console.log(`Collector ended with ${collected.size} items`);
+    const msg = collected.first() || event;
+    msg
+      .editReply({
+        content: '```This operation has expired.```',
+        components: [],
+      })
+      .catch((err) => console.log(err));
+    // collected.last().message.edit("This operation has expired.").catch(err=>console.log(err));
+  });
 };
+
+const generatePage = async (event, page, options: btnOption[], selected) => {
+  // CREATE PAGE
+  const NUM_ITEMS_PER_ROW = 5;
+  const NUM_ROWS_PER_PAGE = 2;
+
+  const customIdParts = event.customId.split('.');
+  const modifier = customIdParts[2];
+  console.log('CURRENT PAGE:', page);
+  let pageNum = Number(page);
+
+  // form embed
+  // const embed = new Embed().setColor([72, 89, 22]).setTitle(`Captcha Verification`).setFooter({
+  //   text: event.guild.name,
+  //   iconURL: event.guild.iconURL(),
+  // });
+  //.setImage(captchaTest.link);
+
+  const items = [];
+  options.forEach((i) => {
+    const userHas = selected.has(i.id);
+    const btn = new ButtonComponent()
+      .setCustomId(`selfroles.$select.${i.id}.${!userHas}`)
+      .setLabel(i.label)
+      .setStyle(userHas ? ButtonStyle.Primary : ButtonStyle.Secondary);
+    if (i.icon) btn.setEmoji(isNaN(parseInt(i.icon)) ? { name: i.icon } : { id: i.icon });
+    items.push(btn);
+  });
+
+  const rows = [];
+  const firstItemOffset = pageNum * NUM_ITEMS_PER_ROW * NUM_ROWS_PER_PAGE;
+  let lastOffset = 0;
+
+  console.log(JSON.stringify(items[0]));
+  for (let i = 0; i < NUM_ROWS_PER_PAGE && lastOffset < items.length; i++) {
+    let offset = firstItemOffset + i * NUM_ITEMS_PER_ROW;
+    lastOffset = Math.min(offset + NUM_ITEMS_PER_ROW, items.length);
+    // console.log(`pageNum(${pageNum}) firstItemOffset(${firstItemOffset}) offset(${offset}) lastOffset(${lastOffset}) items.length(${items.length})`);
+    let temp = items.slice(offset, lastOffset);
+    const newRow = new ActionRow().addComponents(...temp);
+    rows.push(newRow);
+  }
+
+  // method($open)   modifier(Country)
+  let buttons = [];
+  // if (pageNum > 0) {
+  buttons.push(
+    new ButtonComponent()
+      .setCustomId(`selfroles.$prev.${modifier}`)
+      .setLabel('<< Prev')
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(pageNum <= 0),
+  );
+
+  buttons.push(new ButtonComponent().setCustomId(`selfroles.$close.${modifier}`).setLabel('Close').setStyle(ButtonStyle.Secondary).setDisabled(false));
+
+  buttons.push(
+    new ButtonComponent()
+      .setCustomId(`selfroles.$next.${modifier}.${pageNum + 1}`)
+      .setLabel('Next >>')
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(lastOffset >= items.length),
+  );
+
+  if (buttons.length > 0) {
+    rows.push(new ActionRow().addComponents(...buttons));
+  }
+
+  return { rows };
+};
+
+class btnOption {
+  id: string;
+  label: string;
+  icon: string;
+}
 //         await event.editReply({ embeds: [embed], components: [], ephemeral: true }).catch((err) => {});
 
 //         if (code != selected.correct) {
