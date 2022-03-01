@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, SlashCommandSubcommandGroupBuilder } from '@discordjs/builders';
 
+
 export default async (client) => {
   const devServer = '946563674858979358';
   const commands = client.guilds.cache.get(devServer).commands;
@@ -27,7 +28,7 @@ export default async (client) => {
       subcommand
         .setName('delete')
         .setDescription('Delete role from self roles.')
-        .addStringOption((role) => role.setName('role').setDescription('The name of the role to delete.').setRequired(true)),
+        .addRoleOption((role) => role.setName('role').setDescription('The role to delete from self roles.').setRequired(true)),
     )
     // LINK ROLES
     .addSubcommand((subcommand) =>
