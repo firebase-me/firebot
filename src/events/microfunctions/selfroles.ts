@@ -113,7 +113,7 @@ const paginate = async (client, config, event, state: StoreService) => {
 
   // generate page elements
   const page = await generatePage(event, currentPage, options, event.member.roles.cache);
-  let message = "``` + Please navigate the following menu to enable and disable roles.```";
+  let message = "``` + Please navigate the following menu to enable and disable roles.```.";
 
   // reply
   let xx = await event.editReply({
@@ -143,6 +143,11 @@ const paginate = async (client, config, event, state: StoreService) => {
 
     // refresh page
     if (action == '$close') {
+    //   await i.update({
+    //   content: "```Closing...```",
+    //   // embeds: [newPage.embed],
+    //   fetchReply: true,
+    // });
       collector.stop('close');
       return;
     }
@@ -169,14 +174,14 @@ const paginate = async (client, config, event, state: StoreService) => {
 
   collector.on('end', (collected) => {
     console.log(`Collector ended with ${collected.size} items`);
-    const msg = collected.first() || event;
-    msg
-      .editReply({
-        content: '```This operation has expired.```',
-        components: [],
-      })
-      .catch((err) => console.log(err));
-    // collected.last().message.edit("This operation has expired.").catch(err=>console.log(err));
+    const msg = collected.first();
+    const content = { content: '```diff\n- This interaction has closed.```',
+      components: []
+    };
+    msg.editReply(content)
+    .catch(() => 
+    msg.update(content)
+    .catch(() => console.log('Failed to update message')));
   });
 };
 

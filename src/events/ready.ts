@@ -1,9 +1,11 @@
 import { Client, ActionRow, ButtonComponent, Embed, ButtonStyle, ChannelType } from 'discord.js';
+import setupCommands from './microfunctions/slashcommands'
 import { hexToRgb } from './../utils/color';
 
 export default (client: Client, config, state) => {
   // log
   console.log(`--> Bot online`);
+  setupCommands(client);
 
   // Find verification message else post new one
   if (!config.get('discord.messages.verify')) {
