@@ -27,6 +27,7 @@
     "@nestjs/platform-express": "^8.0.0",
     "discord.js": "^14.0.0-dev.1645661258.8203c5d",
     "djinn-state": "^2.0.0",
+    "emoji-aware": "^3.0.5",
     "joi": "^17.6.0",
     "js-yaml": "^4.1.0",
     "jsonrw": "^1.1.0",

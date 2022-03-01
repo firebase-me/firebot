@@ -2,7 +2,7 @@ import { ActionRow, ComponentType, Embed, SelectMenuComponent, SelectMenuInterac
 import rn from 'random-number';
 
 const handle = async (client, config, event, state) => {
-  const reply = await event.deferReply({ ephemeral: true });
+  await event.deferReply({ ephemeral: true });
   const captcha = config.get('captcha');
 
   const captchaTest =

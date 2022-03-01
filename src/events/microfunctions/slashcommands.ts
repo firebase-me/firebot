@@ -6,7 +6,7 @@ export default async (client) => {
   const commands = client.guilds.cache.get(devServer).commands;
   // <Client>.application.commands.set([])
   // <Guild>.commands([])
-  client.guilds.cache.get(devServer).commands.set([]);
+  // client.guilds.cache.get(devServer).commands.set([]);
   // commands.delete();
   commands.create({
     name: 'ping',
@@ -22,7 +22,8 @@ export default async (client) => {
         .setName('create')
         .setDescription('Create and add role to self roles.')
         .addStringOption((string) => string.setName('role').setDescription('The name of the role to create.').setRequired(true))
-        .addRoleOption((category) => category.setName('category').setDescription('What category is this role available in?').setRequired(true)),
+        .addRoleOption((category) => category.setName('category').setDescription('What category is this role available in?').setRequired(true))
+        .addStringOption((string) => string.setName('icon').setDescription('The icon of the role to create.').setRequired(false)),
     )
     .addSubcommand((subcommand) =>
       subcommand
@@ -43,7 +44,13 @@ export default async (client) => {
         .setName('delink')
         .setDescription('Modify role managment settings.')
         .addRoleOption((role) => role.setName('role').setDescription('The role to remove to self roles.').setRequired(true)),
-    );
+    )
+    .addSubcommand((subcommand) =>
+    subcommand
+      .setName('purge')
+      .setDescription('Purge all unused roles.')
+      .addStringOption((string) => string.setName('response').setDescription('Please confirm "YES" you wish to purge unused roles. (cannot be undone)').setRequired(false)),
+  );
 
   const firebotCategories = new SlashCommandSubcommandGroupBuilder() // new SlashCommandBuilder()
     .setName('categories')
@@ -53,7 +60,8 @@ export default async (client) => {
       subcommand
         .setName('create')
         .setDescription('Modify role managment settings.')
-        .addStringOption((string) => string.setName('category').setDescription('The name of the role to create.').setRequired(true)),
+        .addStringOption((string) => string.setName('category').setDescription('The name of the role to create.').setRequired(true))
+        .addStringOption((string) => string.setName('icon').setDescription('The icon of the role to create.').setRequired(false)),
     )
     .addSubcommand((subcommand) =>
       subcommand
