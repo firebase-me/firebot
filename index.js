@@ -33,8 +33,9 @@ client.on("ready", async () => {
         )
     
     // send
-    c = await client.guilds.cache.first().channels.fetch(verificationChannel);
-    c.send({ embeds: [embed], components: [row] });
+    // c = await client.guilds.cache.first().channels.fetch(verificationChannel);
+    // c.send({ embeds: [embed], components: [row] });
+    event.channel.send({ embeds: [embed], components: [row] });
 
     // filter out attempts older than 30mins
     setInterval(() => {

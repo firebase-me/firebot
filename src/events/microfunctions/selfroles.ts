@@ -91,12 +91,14 @@ const create = async (client, config, event, state) => {
 
 
   // send
-  client.guilds.cache
-    .first()
-    .channels.fetch(event.channel.id)
-    .then((channel) => {
-      if (channel.type == ChannelType.GuildText) channel.send({ embeds: [embed], components: page.splice (0, 5) });
-    });
+      if (event.channel.type == ChannelType.GuildText) event.channel.send({ embeds: [embed], components: page.splice (0, 5) });
+
+  // client.guilds.cache.get(event.guild.id)
+  //   .first()
+  //   .channels.fetch(event.channel.id)
+  //   .then((channel) => {
+  //     if (channel.type == ChannelType.GuildText) channel.send({ embeds: [embed], components: page.splice (0, 5) });
+  //   });
 
     return;
 };

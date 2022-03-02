@@ -19,7 +19,6 @@
 			{
 				"label": "Platforms",
 				"id": "947830412070240306",
-				"description": "Select the rameworks you use",
 				"roles": [
 					{
 						"id": "947830204678688768",
@@ -55,7 +54,6 @@
 			{
 				"label": "Frameworks",
 				"id": "947830575098654750",
-				"description": "Select the rameworks you use",
 				"roles": [
 					{
 						"id": "946970852551979049",
@@ -100,7 +98,6 @@
 			{
 				"label": "Languages",
 				"id": "947830682795769886",
-				"description": "Select the rameworks you use",
 				"roles": [
 					{
 						"id": "947831013525053451",
@@ -152,7 +149,6 @@
 			{
 				"label": "Location",
 				"id": "947831844735442994",
-				"description": "Select the rameworks you use",
 				"max": 2,
 				"roles": [
 					{
@@ -219,7 +215,6 @@
 			{
 				"label": "Experts Program",
 				"id": "947866660570800199",
-				"description": "Select the rameworks you use",
 				"roles": [
 					{
 						"id": "947866667441074176",
@@ -346,11 +341,6 @@
 				"label": "Languages",
 				"id": "948544508331700265",
 				"roles": [
-					{
-						"id": "948548825356849182",
-						"label": "Javascript",
-						"icon": "755340917883273256"
-					},
 					{
 						"id": "948548966209966081",
 						"label": "JavaScript",

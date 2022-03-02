@@ -4,8 +4,7 @@ import JsonRW from 'jsonrw';
 import { hexToRgb } from 'src/utils/color';
 import selfroles from './microfunctions/selfroles';
 
-
-const create = async (client: Client, config, message,state) => {
+const create = async (client: Client, config, message, state) => {
   const helpDoc = `./_help.json`;
   const Roles = await JsonRW.Read('./_roles.json');
   try {
@@ -19,10 +18,8 @@ const create = async (client: Client, config, message,state) => {
     if (md[0] == '!Set.RoleManagment' && message.member.roles.cache.has(Roles[message.guild.id].staff)) {
       await message.delete();
       selfroles.create(client, config, message, state);
-    }
-    else
-    if (md[0].toLowerCase() == `${config.get('discord.command')}help`)
-      if (md[1].toLowerCase() == `set`) {
+    } else if (md[0].toLowerCase() == `${config.get('discord.command')}help`)
+      if (md[1] && md[1].toLowerCase() == `set`) {
         // staff
         if (!message.member.roles.cache.has(Roles[message.guild.id].staff)) {
           const embed = new Embed()
@@ -66,9 +63,10 @@ const create = async (client: Client, config, message,state) => {
           .setColor(hexToRgb(config.get('palette.primary')))
           .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
           .setDescription(
-            `Current help list!\n\n NAME: DESCRIPTION \n${help[message.guild.id].reduce((agg, i) => (agg += `> **${i.trigger}:** *${i.name}* \n`), '')}\n\n use ***${config.get(
-              'discord.command',
-            )}help <name>***`,
+            `Current help list!\n\n NAME: DESCRIPTION \n${help[message.guild.id].reduce(
+              (agg, i) => (agg += `> **${i.trigger}:** *${i.name}* \n`),
+              '',
+            )}\n\n use ***${config.get('discord.command')}help <name>***`,
           );
         return await message.channel.send({ embeds: [embed] });
       }
@@ -84,7 +82,9 @@ const create = async (client: Client, config, message,state) => {
       }
 
       // valid?
-      const result = (await JsonRW.Read(helpDoc))[message.guild.id].filter((t) => t.trigger.toLowerCase() == md.slice(1).join(' ').toLowerCase())[0];
+      const result = (await JsonRW.Read(helpDoc))[message.guild.id].filter(
+        (t) => t.trigger.toLowerCase() == md.slice(1).join(' ').toLowerCase(),
+      )[0];
       if (result == null) {
         const embed = new Embed()
           .setColor(hexToRgb(config.get('palette.secondary')))
@@ -94,7 +94,10 @@ const create = async (client: Client, config, message,state) => {
       }
 
       // display
-      const embed = new Embed().setColor(hexToRgb(config.get('palette.primary'))).setTitle(result.name).setDescription(result.body);
+      const embed = new Embed()
+        .setColor(hexToRgb(config.get('palette.primary')))
+        .setTitle(result.name)
+        .setDescription(result.body);
       await message.channel.send({ embeds: [embed] });
     }
   } catch (e) {
