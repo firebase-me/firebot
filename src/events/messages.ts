@@ -41,14 +41,13 @@ const create = async (client: Client, config, message,state) => {
         }
 
         // save to json
-        const data = await JsonRW.Read(helpDoc);
-        data.filter((t) => t.name.toLowerCase() != md[2].toLowerCase()); // enables overwriting
-        data.push({
+        const help = await JsonRW.Read(helpDoc);
+        help[message.guild.id].push({
           trigger: md[2].toLowerCase(),
           name: md[2],
           body: md.slice(3).join(' '),
         });
-        JsonRW.Write(helpDoc, data);
+        JsonRW.Write(helpDoc, help);
 
         // reply
         const embed = new Embed()
@@ -61,12 +60,12 @@ const create = async (client: Client, config, message,state) => {
           );
         return await message.channel.send({ embeds: [embed] });
       } else if (md[1].toLowerCase() == `list`) {
-        const data = await JsonRW.Read(helpDoc);
+        const help = await JsonRW.Read(helpDoc);
         const embed = new Embed()
           .setColor(hexToRgb(config.get('palette.primary')))
           .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
           .setDescription(
-            `Current help list!\n\n NAME: DESCRIPTION \n${data.reduce((agg, i) => (agg += `> **${i.trigger}:** *${i.name}* \n`), '')}\n\n use ***${config.get(
+            `Current help list!\n\n NAME: DESCRIPTION \n${help[message.guild.id].reduce((agg, i) => (agg += `> **${i.trigger}:** *${i.name}* \n`), '')}\n\n use ***${config.get(
               'discord.command',
             )}help <name>***`,
           );
@@ -84,7 +83,7 @@ const create = async (client: Client, config, message,state) => {
       }
 
       // valid?
-      const result = (await JsonRW.Read(helpDoc)).filter((t) => t.trigger.toLowerCase() == md.slice(1).join(' ').toLowerCase())[0];
+      const result = (await JsonRW.Read(helpDoc))[message.guild.id].filter((t) => t.trigger.toLowerCase() == md.slice(1).join(' ').toLowerCase())[0];
       if (result == null) {
         const embed = new Embed()
           .setColor(hexToRgb(config.get('palette.secondary')))

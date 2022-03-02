@@ -5,6 +5,9 @@ import { hexToRgb } from './../utils/color';
 export default (client: Client, config, state) => {
   // log
   console.log(`--> Bot online`);
+  // HEALTH CHECK
+  // Make sure ALL config's have the guild added as a prefix
+
   setupCommands(client);
 
   // Find verification message else post new one

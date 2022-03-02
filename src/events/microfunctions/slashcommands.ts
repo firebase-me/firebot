@@ -2,16 +2,10 @@ import { SlashCommandBuilder, SlashCommandSubcommandGroupBuilder } from '@discor
 
 
 export default async (client) => {
-  const devServer = '946563674858979358';
-  const commands = client.guilds.cache.get(devServer).commands;
-  // <Client>.application.commands.set([])
+  // const commands = client.guilds.cache.get(client.guild.id).commands;
   // <Guild>.commands([])
-  // client.guilds.cache.get(devServer).commands.set([]);
+  // client.guilds.cache.get(client.guild.id).commands.set([]);
   // commands.delete();
-  commands.create({
-    name: 'ping',
-    description: 'Replies with pong and calculates latency.',
-  });
 
   const firebotRoles = new SlashCommandSubcommandGroupBuilder() // new SlashCommandBuilder()
     .setName('roles')
@@ -77,11 +71,21 @@ export default async (client) => {
     .addSubcommandGroup(firebotRoles)
     .addSubcommandGroup(firebotCategories);
 
+    
+    // guild.commands.create({
+    //   name: 'ping',
+    //   description: 'Replies with pong and calculates latency.',
+    // });
   // const  botCommand = new SlashCommandBuilder()
   // .setName('firebot')
   // .setDescription('Admin command for configuring the bot.')
   // .addSubcommandGroup(firebotCommands)
 
-  commands.create(roleManager.toJSON());
+
+  client.application.commands.create(roleManager.toJSON())
+  // const guilds = client.guilds.cache.map((guild) => guild);
+  // for (const guild of guilds) {
+  // guild.commands.create();
+  // }
   // commands.create(botCommand.toJSON());
 };

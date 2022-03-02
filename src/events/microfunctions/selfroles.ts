@@ -4,14 +4,9 @@ import {
   ButtonComponent,
   ButtonInteraction,
   ButtonStyle,
-  CachedManager,
   ChannelType,
   ComponentType,
-  Embed,
-  GuildMemberRoleManager,
-  Interaction,
-  SelectMenuComponent,
-  SelectMenuInteraction,
+  Embed
 } from 'discord.js';
 import JsonRW from 'jsonrw';
 import { StoreService } from 'src/store/store.service';
@@ -82,7 +77,7 @@ const create = async (client, config, event, state) => {
     .setColor(hexToRgb(config.get('palette.primary')));
 
   const options = [];
-  categories.forEach((c) => {
+  categories[event.guild.id].forEach((c) => {
     options.push(new ButtonComponent().setCustomId(`selfroles.$open.${c.label.toLowerCase()}`).setLabel(c.label).setStyle(ButtonStyle.Secondary));
   });
 
@@ -109,11 +104,11 @@ const paginate = async (client, config, event, state: StoreService) => {
 
   // LOAD AVAILABLE ROLES
   const Roles = await JsonRW.Read('./_roles.json');
-  const options = Roles.find((c) => c.label.toLowerCase() == category.toLowerCase()).roles;
+  const catagory = Roles[event.guild.id].find((c) => c.label.toLowerCase() == category.toLowerCase());
 
   // generate page elements
-  const page = await generatePage(event, currentPage, options, event.member.roles.cache);
-  let message = "``` + Please navigate the following menu to enable and disable roles.```.";
+  const page = await generatePage(event, currentPage, catagory.roles, event.member.roles.cache);
+  let message = "```diff\nPlease navigate the following menu to enable and disable roles.```.";
 
   // reply
   let xx = await event.editReply({
@@ -152,9 +147,22 @@ const paginate = async (client, config, event, state: StoreService) => {
       return;
     }
     if (action == '$select') {
-      const msg = `You have ${bias == 'true' ? 'added' : 'removed'} the ${options.find((c) => c.id == modifier).label} role.`;
-      message = '```' + msg + '```';
-      // await event.message.guild.members.cache.get(event.user.id).roles.add(i.label);
+
+      const memberRoles = event.message.member.roles.cache.map(r => r.id);
+      const catagoryRoles = [... new Set(catagory.roles.map(r => r.id))];
+      let roleCount = 0;
+      catagoryRoles.forEach(roles => {
+        if(memberRoles.includes(roles)) roleCount++;
+      });
+      let msg="";
+
+      if(category.max && roleCount >= category.max && bias == 'true') {
+        msg = "- You have reached the maximum amount of roles for this category.";
+      }
+      else
+      msg = `+ You have ${bias == 'true' ? 'added' : 'removed'} the ${catagory.roles.find((c) => c.id == modifier).label} role.`;
+      message = '```diff\n' + msg + '```';
+
       if (bias == 'true') await event.member.roles.add(modifier).catch((err) => console.log(`No permissions to assign roles!`, err));
       else await event.member.roles.remove(modifier).catch((err) => console.log(`No permissions to assign roles!`, err));
     }
@@ -163,7 +171,7 @@ const paginate = async (client, config, event, state: StoreService) => {
     if (action == '$next') currentPage++;
     if (action == '$prev') currentPage--;
 
-    const newPage = await generatePage(i, currentPage, options, event.member.roles.cache);
+    const newPage = await generatePage(i, currentPage, catagory.roles, event.member.roles.cache);
     await i.update({
       content: message,
       // embeds: [newPage.embed],

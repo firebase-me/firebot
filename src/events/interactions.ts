@@ -7,39 +7,6 @@ import captcha from './microfunctions/verifycaptcha';
 const invoke = async (client: any, config: any, event, state: StoreService) => {
   // Process slash commands
   if (event.isCommand() && event.inCachedGuild()) {
-    // console.log(`--> Command: ${event.commandName}`);
-    // console.log(`--> Options: ${JSON.stringify(event.options)}`);
-    // Command: role-manager
-    // Options: {"_group":"roles",
-    // "_subcommand":"create",
-    // "_hoistedOptions":[{
-    //     "name":"role",
-    //     "type":3,
-    //     "value":"test"
-    // },{
-    //     "name":"category",
-    //     "type":8,
-    //     "value":"947830412070240306",
-    //     "role":{"guild":"946563674858979358","icon":null,"unicodeEmoji":null,"id":"947830412070240306","name":"== Platforms ==","color":0,"hoist":false,"rawPosition":40,"permissions":"556302140929","managed":false,"mentionable":false,"tags":null,"createdTimestamp":1646050780075}
-    // }]}
-
-    // // --> Options: {"_group":"roles",
-    // "_subcommand":"create",
-    // "_hoistedOptions":
-    // [{
-    //   "name":"role",
-    //   "type":3,"value":
-    //   "Test role"
-    // },{
-    //   "name":"category",
-    //   "type":8,
-    //   "value":"947830412070240306"
-    // },{
-    //   "name":"icon",
-    //   "type":3,
-    //   "value":"<:react:841134994944426014>"}
-    // ]}
-
     if (event.commandName === 'role-manager') {
       if (event.options._group === 'roles') {
         console.log(`--> Options: ${JSON.stringify(event.options)}`);
@@ -48,19 +15,19 @@ const invoke = async (client: any, config: any, event, state: StoreService) => {
           await event.deferReply({ ephemeral: true });
         switch (event.options._subcommand) {
           case 'create':
-            result = await rolemanagment.createRole(client, event.options._hoistedOptions[0].value, event.options._hoistedOptions[1].value, event.options._hoistedOptions[2].value);
+            result = await rolemanagment.createRole({client, guild: event.guild}, event.options._hoistedOptions[0].value, event.options._hoistedOptions[1].value, event.options._hoistedOptions[2].value);
             break;
           case 'delete':
-            result = await rolemanagment.deleteRole(client, event.options._hoistedOptions[0].value);
+            result = await rolemanagment.deleteRole({client, guild: event.guild}, event.options._hoistedOptions[0].value);
             break;
           case 'link':
-            result = await rolemanagment.linkRole(client, event.options._hoistedOptions[0].value, event.options._hoistedOptions[1].value);
+            result = await rolemanagment.linkRole({client, guild: event.guild}, event.options._hoistedOptions[0].value, event.options._hoistedOptions[1].value);
             break;
           case 'delink':
-            result = await rolemanagment.delinkRole(client, event.options._hoistedOptions[0].value);
+            result = await rolemanagment.delinkRole({client, guild: event.guild}, event.options._hoistedOptions[0].value);
             break;
             case 'purge':
-              result = await rolemanagment.purgeRoles(client, event.options._hoistedOptions[0].value);
+              result = await rolemanagment.purgeRoles({client, guild: event.guild}, event.options._hoistedOptions[0].value);
               break;
           default:
             break;
