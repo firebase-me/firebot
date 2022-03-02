@@ -77,7 +77,7 @@ const create = async (client, config, event, state) => {
     .setColor(hexToRgb(config.get('palette.primary')));
 
   const options = [];
-  categories[event.guild.id].forEach((c) => {
+  categories[event.guild.id].selfRoles.forEach((c) => {
     options.push(new ButtonComponent().setCustomId(`selfroles.$open.${c.label.toLowerCase()}`).setLabel(c.label).setStyle(ButtonStyle.Secondary));
   });
 
@@ -104,7 +104,7 @@ const paginate = async (client, config, event, state: StoreService) => {
 
   // LOAD AVAILABLE ROLES
   const Roles = await JsonRW.Read('./_roles.json');
-  const catagory = Roles[event.guild.id].find((c) => c.label.toLowerCase() == category.toLowerCase());
+  const catagory = Roles[event.guild.id].selfRoles.find((c) => c.label.toLowerCase() == category.toLowerCase());
 
   // generate page elements
   const page = await generatePage(event, currentPage, catagory.roles, event.member.roles.cache);

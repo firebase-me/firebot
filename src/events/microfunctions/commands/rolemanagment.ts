@@ -1,14 +1,5 @@
 import JsonRW from 'jsonrw';
 import { onlyEmoji } from 'emoji-aware';
-const protectedRoles = [
-  '946568242229542966',
-  '946564758935576617',
-  '946564798823399494',
-  '946564812303900743',
-  '946785451002462208',
-  '946787183434563665',
-  '946564816414339132',
-];
 
 const createRole = async (client, role, category, icon?) => {
   const categoryRole = await client.guilds.cache.get(client.guild.id).roles.cache.get(category);
@@ -21,7 +12,7 @@ const createRole = async (client, role, category, icon?) => {
   });
   // add role to category
   const Roles = await JsonRW.Read('./_roles.json');
-  Roles[client.guild.id].find((c) => c.id == categoryRole.id).roles.push({
+  Roles[client.guild.id].selfRoles.find((c) => c.id == categoryRole.id).roles.push({
     id: newRole.id,
     label: role,
     icon: iconId(icon) || undefined,
@@ -33,7 +24,7 @@ const listRoles = async (client, category?) => {
   // TODO: delink role from specific category
   // remove role from self roles
   const Roles = await JsonRW.Read('./_roles.json');
-  const list = Roles[client.guild.id].find((c) => c.id == category)?.roles.map((r) => {
+  const list = Roles[client.guild.id].selfRoles.find((c) => c.id == category)?.roles.map((r) => {
     return { id: r.id, label: r.label, icon: r.icon };
   });
   return list;
@@ -43,14 +34,14 @@ const deleteRole = async (client, role, category?) => {
   // TODO: delink role from specific category
   // remove role from self roles
   const Roles = await JsonRW.Read('./_roles.json');
-  Roles[client.guild.id].forEach((c) => {
+  Roles[client.guild.id].selfRoles.forEach((c) => {
     const found = c.roles.find((r) => r.id == role);
     if (found) c.roles.splice(c.roles.indexOf(found), 1);
   });
   // remove role from category
   await JsonRW.Write('./_roles.json', Roles);
   // delete role
-  if (!protectedRoles.includes(role)) await client.guilds.cache.get(client.guild.id).roles.cache.get(role).delete();
+  if (!Roles[client.guild.id].protectedRoles.includes(role)) await client.guilds.cache.get(client.guild.id).roles.cache.get(role).delete();
 };
 const linkRole = async (client, role, category, icon?) => {
   const categoryRole = await client.guilds.cache.get(client.guild.id).roles.cache.get(category);
@@ -69,7 +60,7 @@ const delinkRole = async (client, role, category?) => {
   // TODO: delink role from specific category
   // remove role from self roles
   const Roles = await JsonRW.Read('./_roles.json');
-  Roles[client.guild.id].forEach((c) => {
+  Roles[client.guild.id].selfRoles.forEach((c) => {
     const found = c.roles.find((r) => r.id == role);
     if (found) c.roles.splice(c.roles.indexOf(found), 1);
   });
@@ -106,25 +97,25 @@ const listCategories = async (client) => {
 const deleteCategory = async (client, category, bias?) => {
   // delete category from self roles
   const Roles: any[] = await JsonRW.Read('./_roles.json');
-  Roles[client.guild.id].forEach((c, i) => {
+  Roles[client.guild.id].selfRoles.forEach((c, i) => {
     if (c.id == category) Roles.splice(i, 1);
   });
   // delete category
   await JsonRW.Write('./_roles.json', Roles);
-  if (bias) if (!protectedRoles.includes(category)) await client.guilds.cache.get(client.guild.id).roles.cache.get(category).delete();
+  if (bias) if (!Roles[client.guild.id].protectedRoles.includes(category)) await client.guilds.cache.get(client.guild.id).roles.cache.get(category).delete();
 };
 
 const purgeRoles = async (client, confirmation) => {
   if (confirmation != 'YES') throw new Error('Invalid confirmation');
-  const Roles: any[] = await JsonRW.Read('./_roles.json');
+  const Roles: {protectedRoles:string[],selfRoles:any[]} = await JsonRW.Read('./_roles.json');
   const usedRoles = new Set();
-  Roles[client.guild.id].forEach((c) => {
+  Roles[client.guild.id].selfRoles.forEach((c) => {
     usedRoles.add(c.id);
     c.roles.forEach((r) => {
       usedRoles.add(r.id);
     });
   });
-  protectedRoles.forEach((r) => usedRoles.add(r));
+  Roles[client.guild.id].protectedRoles.forEach((r) => usedRoles.add(r));
   const roles = await client.guilds.cache.get(client.guild.id).roles.cache.filter((r) => !usedRoles.has(r.id));
 
   for (const role of roles.values()) {
