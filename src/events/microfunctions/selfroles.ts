@@ -99,12 +99,12 @@ const paginate = async (client, config, event, state: StoreService) => {
   let currentPage = 0;
 
   const method = idMeta[1];
-  const category = idMeta[2];
+  const operation = idMeta[2];
   console.log('Paginate:', idMeta);
 
   // LOAD AVAILABLE ROLES
   const Roles = await JsonRW.Read('./_roles.json');
-  const catagory = Roles[event.guild.id].selfRoles.find((c) => c.label.toLowerCase() == category.toLowerCase());
+  const catagory = Roles[event.guild.id].selfRoles.find((c) => c.label.toLowerCase() == operation.toLowerCase());
 
   // generate page elements
   const page = await generatePage(event, currentPage, catagory.roles, event.member.roles.cache);
@@ -134,7 +134,6 @@ const paginate = async (client, config, event, state: StoreService) => {
     const action = idMeta[1];
     const modifier = idMeta[2];
     const bias = idMeta[3];
-    console.log('COLLECTED', idMeta);
 
     // refresh page
     if (action == '$close') {
@@ -148,22 +147,27 @@ const paginate = async (client, config, event, state: StoreService) => {
     }
     if (action == '$select') {
 
-      const memberRoles = event.message.member.roles.cache.map(r => r.id);
+      const memberRoles = event.member.roles.cache.map(r => r.id);
       const catagoryRoles = [... new Set(catagory.roles.map(r => r.id))];
       let roleCount = 0;
-      catagoryRoles.forEach(roles => {
-        if(memberRoles.includes(roles)) roleCount++;
-      });
-      let msg="";
 
-      if(category.max && roleCount >= category.max && bias == 'true') {
+      for (const role of memberRoles) {
+        if(catagoryRoles.includes(role)) {
+          roleCount++;
+        }
+      }
+      let msg="";
+      let limited = false;
+
+      if(catagory.max && roleCount >= catagory.max && bias == 'true') {
         msg = "- You have reached the maximum amount of roles for this category.";
+        limited = true;
       }
       else
       msg = `+ You have ${bias == 'true' ? 'added' : 'removed'} the ${catagory.roles.find((c) => c.id == modifier).label} role.`;
       message = '```diff\n' + msg + '```';
 
-      if (bias == 'true') await event.member.roles.add(modifier).catch((err) => console.log(`No permissions to assign roles!`, err));
+      if (bias == 'true'&& !limited) await event.member.roles.add(modifier).catch((err) => console.log(`No permissions to assign roles!`, err));
       else await event.member.roles.remove(modifier).catch((err) => console.log(`No permissions to assign roles!`, err));
     }
 
@@ -186,6 +190,7 @@ const paginate = async (client, config, event, state: StoreService) => {
     const content = { content: '```diff\n- This interaction has closed.```',
       components: []
     };
+    if(!msg) return;
     msg.editReply(content)
     .catch(() => 
     msg.update(content)
