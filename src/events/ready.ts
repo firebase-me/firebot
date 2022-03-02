@@ -1,13 +1,16 @@
 import { Client, ActionRow, ButtonComponent, Embed, ButtonStyle, ChannelType } from 'discord.js';
 import setupCommands from './microfunctions/slashcommands'
 import { hexToRgb } from './../utils/color';
+import healthCheck from './microfunctions/healthCheck';
 
-export default (client: Client, config, state) => {
+export default async (client: Client, config, state) => {
   // log
-  console.log(`--> Bot online`);
+  console.log(`#> Bot online`);
   // HEALTH CHECK
   // Make sure ALL config's have the guild added as a prefix
-
+  
+  
+  await healthCheck(client);
   setupCommands(client);
 
   // Find verification message else post new one

@@ -7,6 +7,7 @@ import selfroles from './microfunctions/selfroles';
 
 const create = async (client: Client, config, message,state) => {
   const helpDoc = `./_help.json`;
+  const Roles = await JsonRW.Read('./_roles.json');
   try {
     // filter
     if (message.author.bot || !message.content.startsWith(config.get('discord.command'))) return;
@@ -15,7 +16,7 @@ const create = async (client: Client, config, message,state) => {
     const msg = message.content.toLowerCase();
     const md = message.content.split(' ');
     // commands
-    if (md[0] == '!Set.RoleManagment' && message.member.roles.cache.has(config.get('discord.roles.staff'))) {
+    if (md[0] == '!Set.RoleManagment' && message.member.roles.cache.has(Roles[message.guild.id].staff)) {
       await message.delete();
       selfroles.create(client, config, message, state);
     }
@@ -23,7 +24,7 @@ const create = async (client: Client, config, message,state) => {
     if (md[0].toLowerCase() == `${config.get('discord.command')}help`)
       if (md[1].toLowerCase() == `set`) {
         // staff
-        if (!message.member.roles.cache.has(config.get('discord.roles.staff'))) {
+        if (!message.member.roles.cache.has(Roles[message.guild.id].staff)) {
           const embed = new Embed()
             .setColor(hexToRgb(config.get('palette.secondary')))
             .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })

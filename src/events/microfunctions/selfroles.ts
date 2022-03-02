@@ -69,7 +69,7 @@ const handle = async (client, config, event: ButtonInteraction, state: StoreServ
 const create = async (client, config, event, state) => {
   // Find verification message else post new one
   const rolesData = `./_roles.json`;
-  const categories = await JsonRW.Read(rolesData);
+  const Roles = await JsonRW.Read(rolesData);
 
   const embed = new Embed()
     .setTitle(`**ROLE MANAGMENT**`)
@@ -77,19 +77,28 @@ const create = async (client, config, event, state) => {
     .setColor(hexToRgb(config.get('palette.primary')));
 
   const options = [];
-  categories[event.guild.id].selfRoles.forEach((c) => {
+  Roles[event.guild.id].selfRoles.forEach((c) => {
     options.push(new ButtonComponent().setCustomId(`selfroles.$open.${c.label.toLowerCase()}`).setLabel(c.label).setStyle(ButtonStyle.Secondary));
   });
 
-  const row = new ActionRow().addComponents(...options);
+  // FIXME: create new support for multiple pages with generic types
+  // const newPage = await generatePage({customId: `selfroles.$open`}, 0, options);
+  
+  // sort array into smaller arrays of 5 elements each
+  const rows = _.chunk(options, 5);
+  const page = []
+  rows.forEach((row) => page.push(new ActionRow().addComponents(...row)));
+
 
   // send
   client.guilds.cache
     .first()
     .channels.fetch(event.channel.id)
     .then((channel) => {
-      if (channel.type == ChannelType.GuildText) channel.send({ embeds: [embed], components: [row] });
+      if (channel.type == ChannelType.GuildText) channel.send({ embeds: [embed], components: page.splice (0, 5) });
     });
+
+    return;
 };
 
 // Paginate interactions
@@ -198,7 +207,7 @@ const paginate = async (client, config, event, state: StoreService) => {
   });
 };
 
-const generatePage = async (event, page, options: btnOption[], selected) => {
+const generatePage = async (event, page, options: btnOption[], selected = new Set()) => {
   // CREATE PAGE
   const NUM_ITEMS_PER_ROW = 5;
   const NUM_ROWS_PER_PAGE = 2;

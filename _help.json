@@ -1,6 +1,48 @@
 {
-	"guildID":[],
-	"946563674858979358":[
+	"guildID": [],
+	"946563674858979358": [
+		{
+			"trigger": "code",
+			"name": "How to share code",
+			"body": "\\`\\`\\`js\n<insert code here>\n\\`\\`\\`"
+		},
+		{
+			"trigger": "support",
+			"name": "FIREBASE SUPPORT",
+			"body": "https://firebase.google.com/support/troubleshooter/contact"
+		},
+		{
+			"trigger": "pricing",
+			"name": "FIREBASE PRICING",
+			"body": "https://firebase.google.com/pricing"
+		},
+		{
+			"trigger": "status",
+			"name": "FIREBASE STATUS",
+			"body": "https://status.firebase.google.com/"
+		},
+		{
+			"trigger": "netninja",
+			"name": "Net Ninja: Firebase v9",
+			"body": "https://www.youtube.com/watch?v=9zdvmgGsww0&list=PL4cUxeGkcC9jERUGvbudErNCeSZHWUVlb"
+		},
+		{
+			"trigger": "goodquestion",
+			"name": "How to ask a Good Question",
+			"body": "https://stackoverflow.com/help/how-to-ask"
+		},
+		{
+			"trigger": "appcheck",
+			"name": "Secure App Integrety",
+			"body": "https://firebase.google.com/docs/app-check"
+		},
+		{
+			"trigger": "safe",
+			"name": "Client credentials: Safe to share?",
+			"body": "https://stackoverflow.com/a/37484053/2301161"
+		}
+	],
+	"626375663313748008": [
 		{
 			"trigger": "code",
 			"name": "How to share code",

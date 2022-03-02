@@ -25,8 +25,8 @@ export class AppService {
     this.client.on('messageCreate', async (message) => {
       ClientEvents.messages.create(this.client, this.config, message, this.state);
     });
-    this.client.on('', async (message) => {
-      ClientEvents.messages.create(this.client, this.config, message, this.state);
-    });
+    // this.client.on('', async (message) => {
+    //   ClientEvents.messages.create(this.client, this.config, message, this.state);
+    // });
   }
 }

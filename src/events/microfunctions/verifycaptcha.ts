@@ -1,5 +1,6 @@
 import { ActionRow, ComponentType, Embed, SelectMenuComponent, SelectMenuInteraction } from 'discord.js';
 import rn from 'random-number';
+import JsonRW from 'jsonrw';
 
 const handle = async (client, config, event, state) => {
   await event.deferReply({ ephemeral: true });
@@ -83,8 +84,8 @@ const handle = async (client, config, event, state) => {
             })
             .setDescription(`Correct! The verified role will be assigned to you in a few moments.`);
           await i.update({ embeds: [embed] }).catch((err) => {});
-            console.log(config.get('discord.roles.verified'))
-          await event.member.roles.add(config.get('discord.roles.member')).catch((err) => console.log(`No permissions to assign roles!`,err));
+          const Roles = await JsonRW.read('./data/roles.json');
+          await event.member.roles.add(Roles[event.guild.id].member).catch((err) => console.log(`No permissions to assign roles!`,err));
         }
       });
 
